@@ -12,7 +12,18 @@ include(SHARED_PATH . '/public_header.php');
     <?php if (is_logged_in()) {
         echo 'You are already logged in!<br>';
     } else {
-        echo '<p>Please click <a href="' . url_for("auth/google-oauth.php") . '">here</a> to log in with Google</p>';
+        ?>
+        <div class="centered">
+            <a class="btn btn-google" href="<?php echo url_for("auth/google-oauth.php"); ?>" role="button">
+                <i class="bi bi-google"></i> Click here to continue with Google
+            </a>
+            <br><br>
+            <a class="btn btn-facebook disabled" href="<?php echo url_for("auth/facebook-oauth.php"); ?>" role="button">
+                <i class="bi bi-facebook"></i> Click here to continue with FaceBook
+            </a>
+        </div>
+
+        <?php
     }
     ?>
 </div>

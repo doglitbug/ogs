@@ -13,25 +13,12 @@ if (!isset($page_title)) {
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
               integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
               crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <link rel="stylesheet" media="all" href="<?php echo url_for('/stylesheets/public.css'); ?>"/>
     </head>
 <body>
-<header>
-    <h1>Online Garage Sale</h1>
-</header>
 
-<nav>
-    <ul>
-        <?php
-        if (is_logged_in()) {
-            ?>
-            <li>User: <?php echo $_SESSION['username'] ?? ''; ?></li>
-            <li><a href="<?php echo url_for('/auth/logout.php'); ?>">Logout</a></li>
-            <?php
-        }
-        ?>
-    </ul>
-</nav>
+<?php require('public_navbar.php'); ?>
 
 <?php
 print_and_delete("message");
