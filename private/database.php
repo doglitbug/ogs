@@ -106,7 +106,56 @@ class Database
 
 #endregion
 
-#region xyz
+#region user
+    public function get_user(string $email): array
+    {
+        $email = $this->escape($email);
 
+        $query = <<<SQL
+        SELECT user_id,
+               username,
+               name,
+               email,
+               location.description as location,
+               user.created_at,
+               user.updated_at
+        FROM user
+        LEFT JOIN location using (location_id)
+        WHERE email='$email'
+        LIMIT 1
+    SQL;
+
+        $result = $this->get_query($query);
+        if ($result) {
+            return $result[0];
+        } else {
+            return [];
+        }
+    }
+
+    public function check_email_exists(string $email): bool
+    {
+        return $this->get_user($email) !== [];
+    }
+
+    public function get_access_level($user_id):string{
+        $user_id = $this->escape($user_id);
+
+        $query = <<<SQL
+        SELECT IFNULL(admin.description, 'User') as access
+        FROM user
+        LEFT JOIN user_admin using (user_id)
+        LEFT JOIN admin using (admin_id)
+        WHERE user_id='$user_id' 
+        LIMIT 1
+    SQL;
+
+        $result = $this->get_query($query);
+        if ($result) {
+            return $result[0]['access'];
+        } else {
+            return "";
+        }
+    }
 #endregion
 }

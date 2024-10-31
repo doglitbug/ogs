@@ -1,9 +1,8 @@
 <?php
 global $db;
-require_once('../../private/initialize.php');
-require_login();
+require_once('../private/initialize.php');
 
-$page_title = 'Users';
+$page_title = 'Online Garage Sale';
 include(SHARED_PATH . '/public_header.php');
 ?>
 
