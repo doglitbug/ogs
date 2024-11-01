@@ -2,42 +2,32 @@ body {
     background-color: lightblue ;
 }
 
+.container {
+    padding-top: 10px;
+}
+
 nav.navbar {
     background-color: cornflowerblue;
-    border-radius: 10px;
 }
 
-#content {
-    padding: 15px;
-    min-height: 500px;
-}
-
-a.btn-google {
+a.btn-social {
     border-style: solid;
     border-width: 2px;
     border-radius: 10px;
     border-color: black;
+
+}
+
+a.btn-google {
     background-color: #f2f2f2;
 }
 
 a.btn-facebook {
-    border-style: solid;
-    border-width: 2px;
-    border-radius: 10px;
-    border-color: black;
     background-color: #5890FF;
 }
 
 .centered {
-    max-width: fit-content;
     margin-left: auto;
     margin-right: auto;
     text-align: center;
-}
-
-footer {
-    padding: 15px;
-    border-radius: 10px;
-    height: 50px;
-    background-color: cornflowerblue;
 }

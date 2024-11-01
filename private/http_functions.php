@@ -89,13 +89,19 @@ function is_get_request(): bool
 }
 
 /** Print out a session stored message and unset it
- * @param string $name message/error
+ * @param string $name message
+ * @param string $type Bootstrap alert type
  * @return void
  */
-function print_and_delete(string $name = ""): void
+function print_and_delete(string $name, string $type = "primary"): void
 {
-    if ($name != "" && isset($_SESSION[$name]) && $_SESSION[$name] != '') {
-        echo '<div id="' . $name . '">' . h($_SESSION[$name]) . '</div>';
-        unset($_SESSION[$name]);
+    if (!isset($_SESSION[$name]) || $_SESSION[$name] == "") {
+        return;
     }
+
+    echo '<div class="alert alert-' . $type . ' alert-dismissible fade show" role="alert">';
+    echo h($_SESSION[$name]);
+    echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+    echo '</div>';
+    unset($_SESSION[$name]);
 }

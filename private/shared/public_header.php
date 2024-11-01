@@ -18,9 +18,11 @@ if (!isset($page_title)) {
     </head>
 <body>
 
-<?php require('public_navbar.php'); ?>
-
+<?php
+require('public_navbar.php');
+?>
+    <div class="container">
 <?php
 print_and_delete("message");
-print_and_delete("error");
+print_and_delete("error", "danger");
 ?>

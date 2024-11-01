@@ -14,11 +14,11 @@ include(SHARED_PATH . '/public_header.php');
     } else {
         ?>
         <div class="centered">
-            <a class="btn btn-google" href="<?php echo url_for("auth/google-oauth.php"); ?>" role="button">
+            <a class="btn btn-social btn-google" href="<?php echo url_for("auth/google-oauth.php"); ?>" role="button">
                 <i class="bi bi-google"></i> Click here to continue with Google
             </a>
             <br><br>
-            <a class="btn btn-facebook disabled" href="<?php echo url_for("auth/facebook-oauth.php"); ?>" role="button">
+            <a class="btn btn-social btn-facebook disabled" href="<?php echo url_for("auth/facebook-oauth.php"); ?>" role="button">
                 <i class="bi bi-facebook"></i> Click here to continue with FaceBook
             </a>
         </div>

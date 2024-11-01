@@ -13,6 +13,7 @@ if (is_logged_in()) {
 }
 
 //Get from current URL
+//TODO fix this
 $current = basename(dirname($_SERVER['PHP_SELF']));
 ?>
 
@@ -42,10 +43,13 @@ $current = basename(dirname($_SERVER['PHP_SELF']));
                 }
                 ?>
             </ul>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+            <?php if (is_logged_in()) {
+                ?>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            <?php } ?>
         </div>
     </div>
 </nav>

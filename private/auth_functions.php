@@ -2,7 +2,7 @@
 
 /** Wrapper for get_access_level from database
  * so we don't need to global $db on every level function
- * This is not stored as a $_SESSION variable so that acesss changes are instant
+ * This is not stored as a $_SESSION variable so that access changes are instant
  * @param $user_id
  * @return string Access level Super Admin|Admin|User
  */
@@ -54,7 +54,7 @@ function require_super_admin(): void
 {
     require_login();
     if (!is_super_admin($_SESSION['user_id'])) {
-        $_SESSION['message'] = "This area requires a super admin to access";
+        $_SESSION['message'] = "That area requires a super admin to access";
         //TODO Why here?
         redirect_to(url_for('auth/login.php'));
     }
@@ -67,7 +67,7 @@ function require_admin(): void
 {
     require_login();
     if (!is_super_admin($_SESSION['user_id']) && !is_admin($_SESSION['user_id'])) {
-        $_SESSION['message'] = "This area requires an admin or higher to access";
+        $_SESSION['message'] = "That area requires an admin or higher to access";
         //TODO Why here?
         redirect_to(url_for('auth/login.php'));
     }
@@ -81,7 +81,7 @@ function require_login(): void
     //TODO Add redirect to for after after log in?
     //$_SESSION['redirect'] = h("//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
     if (!is_logged_in()) {
-        $_SESSION['message'] = "This area requires being logged in";
+        $_SESSION['message'] = "That area requires being logged in";
         redirect_to(url_for('auth/login.php'));
     }
 }

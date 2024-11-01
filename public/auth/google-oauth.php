@@ -45,9 +45,9 @@ if (!empty($_GET['code'])) {
             if ($db->check_email_exists($_SESSION['email'])) {
                 //Get user from DB and log in
                 log_in();
-                echo "Welcome back " . $_SESSION['name'];
-
-                echo 'Please click <a href="' . url_for('auth/profile.php') . '">here</a> to view your profile';
+                $_SESSION['message'] = "Welcome back " . $_SESSION['name'];
+                //TODO Close $db?
+                redirect_to(url_for('auth/profile.php'));
             } else {
                 echo 'Account not found, would you like to make a new one?';
                 $_SESSION['name'] = implode(' ', $google_name_parts);

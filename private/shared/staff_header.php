@@ -3,6 +3,7 @@ if (!isset($page_title)) {
     $page_title = 'Staff Area';
 }
 ?>
+
     <!doctype html>
     <html lang="en">
     <head>
@@ -17,9 +18,11 @@ if (!isset($page_title)) {
     </head>
 <body>
 
-<?php require('staff_navbar.php'); ?>
-
+<?php
+require('public_navbar.php');
+?>
+    <div class="container">
 <?php
 print_and_delete("message");
-print_and_delete("error");
+print_and_delete("error", "danger");
 ?>
