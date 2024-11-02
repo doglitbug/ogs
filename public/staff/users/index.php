@@ -3,7 +3,7 @@ global $db;
 require_once('../../../private/initialize.php');
 require_admin();
 
-$page_title = 'Workers';
+$page_title = 'Users';
 include(SHARED_PATH . '/staff_header.php');
 ?>
 

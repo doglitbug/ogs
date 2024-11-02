@@ -92,7 +92,7 @@ function require_login(): void
 function log_in(): void
 {
     global $db;
-    $user = $db->get_user($_SESSION['email']);
+    $user = $db->get_user_by_email($_SESSION['email']);
 
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['username'] = $user['username'];

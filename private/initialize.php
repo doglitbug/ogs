@@ -38,4 +38,4 @@ $db = new Database();
 $db->connect();
 
 //Validation functions (requires $db)
-#require_once('validation_functions.php');
+//require_once('validation_functions.php');

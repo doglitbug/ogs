@@ -19,7 +19,7 @@ if (!isset($page_title)) {
 <body>
 
 <?php
-require('public_navbar.php');
+require('staff_navbar.php');
 ?>
     <div class="container">
 <?php

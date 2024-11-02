@@ -15,7 +15,8 @@ a.btn-social {
     border-width: 2px;
     border-radius: 10px;
     border-color: black;
-
+    min-width: 200px;
+    margin: 5px;
 }
 
 a.btn-google {

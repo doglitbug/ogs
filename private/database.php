@@ -107,7 +107,35 @@ class Database
 #endregion
 
 #region user
-    public function get_user(string $email): array
+    /** Get first 10 users
+     * @return array
+     */
+    public function get_all_users(): array
+    {
+        $query = <<<SQL
+        SELECT user_id,
+               username,
+               name,
+               email,
+               location.description as location,
+               IFNULL(admin.description, 'User') as access,
+               user.created_at,
+               user.updated_at
+        FROM user
+        LEFT JOIN location using (location_id)
+        LEFT JOIN user_admin using (user_id)
+        LEFT JOIN admin using (admin_id)
+        LIMIT 10
+    SQL;
+
+        return $this->get_query($query);
+    }
+
+    /** Get user by email address
+     * @param string $email
+     * @return array
+     */
+    public function get_user_by_email(string $email): array
     {
         $email = $this->escape($email);
 
@@ -133,12 +161,14 @@ class Database
         }
     }
 
+
     public function check_email_exists(string $email): bool
     {
-        return $this->get_user($email) !== [];
+        return $this->get_user_by_email($email) !== [];
     }
 
-    public function get_access_level($user_id):string{
+    public function get_access_level($user_id): string
+    {
         $user_id = $this->escape($user_id);
 
         $query = <<<SQL

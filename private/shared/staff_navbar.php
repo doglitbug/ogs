@@ -1,22 +1,12 @@
 <?php
-if (is_logged_in()) {
-    $sections = array(
-        "Garages" => url_for("garages"),
-        "Items" => url_for("items"),
-        "Profile" => url_for('auth/profile.php'),
-        "Admin" => url_for("staff"),
-        "Log out" => url_for('auth/logout.php')
-    );
-
-    if (!is_admin($_SESSION['user_id'])) {
-        unset($sections['Admin']);
-    }
-} else {
-    $sections = array(
-            "Log in" => url_for("auth/login.php"),
-            "Log in as" => url_for("auth/deleteme.php")
-        );
-}
+$sections = array(
+    "Users" => url_for("staff/users"),
+    "Garages" => url_for("staff/garages"),
+    "Items" => url_for("staff/items"),
+    "Profile" => url_for('auth/profile.php'),
+    "Customer account" => url_for("/"),
+    "Log out" => url_for('auth/logout.php')
+);
 
 //Get from current URL
 //TODO fix this
@@ -25,7 +15,7 @@ $current = basename(dirname($_SERVER['PHP_SELF']));
 
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <a class="navbar-brand" href="<?php echo url_for('/'); ?>">Online Garage Sale</a>
+        <a class="navbar-brand" href="<?php echo url_for('staff'); ?>">Online Garage Sale</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -49,13 +39,6 @@ $current = basename(dirname($_SERVER['PHP_SELF']));
                 }
                 ?>
             </ul>
-            <?php if (is_logged_in()) {
-                ?>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            <?php } ?>
         </div>
     </div>
 </nav>
