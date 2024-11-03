@@ -13,28 +13,28 @@ function url_for(string $script_path): string
 }
 
 /** Apply urlencode to provided value
- * @param string $string input
+ * @param string|null $string input
  * @return string output
  */
-function u(string $string = ""): string
+function u(?string $string = ""): string
 {
     return urlencode($string);
 }
 
 /** Apply rawurlencode to provided value
- * @param string $string input
+ * @param string|null $string input
  * @return string output
  */
-function raw_u(string $string = ""): string
+function raw_u(?string $string = ""): string
 {
     return rawurlencode($string);
 }
 
 /** Apply htmlspecialchars to provided value
- * @param string $string input
+ * @param string|null $string input
  * @return string
  */
-function h(string $string = ""): string
+function h(?string $string = ""): string
 {
     return htmlspecialchars($string);
 }
@@ -104,4 +104,15 @@ function print_and_delete(string $name, string $type = "primary"): void
     echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
     echo '</div>';
     unset($_SESSION[$name]);
+}
+
+/** Debug.print a variable
+ * @param mixed $variable Variable to print out
+ * @return void
+ */
+function dump(mixed $variable): void
+{
+    echo '<pre>';
+    print_r($variable);
+    echo '</pre>';
 }

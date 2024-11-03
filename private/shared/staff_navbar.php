@@ -1,8 +1,8 @@
 <?php
 $sections = array(
-    "Users" => url_for("staff/users"),
-    "Garages" => url_for("staff/garages"),
-    "Items" => url_for("staff/items"),
+    "Users" => url_for("staff/user"),
+    "Garages" => url_for("staff/garage"),
+    "Items" => url_for("staff/item"),
     "Profile" => url_for('auth/profile.php'),
     "Customer account" => url_for("/"),
     "Log out" => url_for('auth/logout.php')

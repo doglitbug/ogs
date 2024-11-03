@@ -11,8 +11,8 @@ include(SHARED_PATH . '/public_header.php');
         <h1><?php echo $page_title; ?></h1>
         <p>This will be the profile page!</p>
         <pre>
-        <?php var_dump($_SESSION); ?>
-    </pre>
+        <?php print_r($_SESSION); ?>
+        </pre>
     </div>
 
 <?php include(SHARED_PATH . '/public_footer.php'); ?>

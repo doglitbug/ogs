@@ -104,10 +104,10 @@ class Database
         }
     }
 
-#endregion
+    #endregion
 
-#region user
-    /** Get first 10 users
+    #region user
+    /** Get first 10 user used for debugging at this time
      * @return array
      */
     public function get_all_users(): array
@@ -126,7 +126,31 @@ class Database
         LEFT JOIN user_admin using (user_id)
         LEFT JOIN admin using (admin_id)
         LIMIT 10
-    SQL;
+        SQL;
+
+        return $this->get_query($query);
+    }
+
+    public function get_user(string $user_id): array
+    {
+        $user_id = $this->escape($user_id);
+
+        $query = <<<SQL
+        SELECT user_id,
+               username,
+               name,
+               email,
+               location.description as location,
+               IFNULL(admin.description, 'User') as access,
+               user.created_at,
+               user.updated_at
+        FROM user
+        LEFT JOIN location using (location_id)
+        LEFT JOIN user_admin using (user_id)
+        LEFT JOIN admin using (admin_id)
+        WHERE user_id = '$user_id'
+        LIMIT 1
+        SQL;
 
         return $this->get_query($query);
     }
@@ -151,7 +175,7 @@ class Database
         LEFT JOIN location using (location_id)
         WHERE email='$email'
         LIMIT 1
-    SQL;
+        SQL;
 
         $result = $this->get_query($query);
         if ($result) {
@@ -161,13 +185,20 @@ class Database
         }
     }
 
-
+    /** Check to see if there is a user in the database with this email
+     * @param string $email
+     * @return bool
+     */
     public function check_email_exists(string $email): bool
     {
         return $this->get_user_by_email($email) !== [];
     }
 
-    public function get_access_level($user_id): string
+    /**
+     * @param string $user_id
+     * @return string
+     */
+    public function get_access_level(string $user_id): string
     {
         $user_id = $this->escape($user_id);
 
@@ -178,7 +209,7 @@ class Database
         LEFT JOIN admin using (admin_id)
         WHERE user_id='$user_id' 
         LIMIT 1
-    SQL;
+        SQL;
 
         $result = $this->get_query($query);
         if ($result) {
@@ -187,5 +218,109 @@ class Database
             return "";
         }
     }
-#endregion
+    #endregion
+
+    #region garage
+    /** Get all garage
+     * @return array
+     */
+    public function get_all_garages(): array
+    {
+        $query = <<<SQL
+            SELECT  garage_id,
+                    name,
+                    garage.description,
+                    location.description as location,
+                    visible,
+                    garage.updated_at,
+                    garage.created_at
+            FROM garage
+            LEFT JOIN location using (location_id)
+        SQL;
+
+        return $this->get_query($query);
+    }
+
+    /** Get an individual garage
+     * @param string $garage_id
+     * @return array
+     */
+    public function get_garage(string $garage_id): array
+    {
+        $garage_id = $this->escape($garage_id);
+
+        $query = <<<SQL
+            SELECT  garage_id,
+                    name,
+                    garage.description,
+                    location.description as location,
+                    visible,
+                    garage.updated_at,
+                    garage.created_at
+            FROM garage
+            LEFT JOIN location using (location_id)
+            WHERE garage_id='$garage_id'
+            LIMIT 1
+        SQL;
+
+        $result = $this->get_query($query);
+
+        if ($result) {
+            return $result[0];
+        } else {
+            return [];
+        }
+    }
+
+    /** Get all garage that this user has access to
+     * @param string $user_id
+     * @param array $options Owner or Worker
+     * @return array
+     * TODO Do this as an option in get_garages?
+     */
+    public function get_user_garages(string $user_id, array $options = []): array
+    {
+        $user_id = $this->escape($user_id);
+        $access_query = isset($options['access']) ? "AND access.description='" . $this->escape($options['access']) . "'" : '';
+        $query = <<<SQL
+        SELECT  user_id,
+            garage_id,
+            garage.name,
+            garage.description as description,
+            access.description as access,
+            location.description as location,
+            visible
+        FROM user_garage_access
+            LEFT JOIN access using (access_id)
+            LEFT JOIN garage using (garage_id)
+            LEFT JOIN location using (location_id)
+        WHERE user_id = '$user_id'
+            {$access_query}
+        ORDER BY access 
+        SQL;
+
+        return $this->get_query($query);
+    }
+    #endregion
+
+    #region item
+    public function get_all_items(array $options = []): array
+    {
+        //TODO Change to AND When WHERE quesy added in?
+        $garage_query = isset($options['garage_id']) ? "WHERE garage_id='" . $this->escape($options['garage_id']) . "'" : '';
+        $query = <<<SQL
+        SELECT  item_id,
+                garage_id,
+                name,
+                description,
+                visible,
+                updated_at,
+                created_at
+        FROM item
+        {$garage_query}
+        SQL;
+
+        return $this->get_query($query);
+    }
+    #endregion
 }

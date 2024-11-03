@@ -1,11 +1,15 @@
 <?php
 global $db;
 require_once('../../private/initialize.php');
+require_admin();
 
-$page_title = 'OGS - Staff area';
+$page_title = 'Staff Area';
 include(SHARED_PATH . '/staff_header.php');
 ?>
 
-<h1><?php echo $page_title; ?></h1>
+<div id="content">
+    <h1><?php echo $page_title; ?></h1>
+
+</div>
 
 <?php include(SHARED_PATH . '/staff_footer.php'); ?>

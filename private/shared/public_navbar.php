@@ -1,15 +1,15 @@
 <?php
 if (is_logged_in()) {
     $sections = array(
-        "Garages" => url_for("garages"),
-        "Items" => url_for("items"),
+        "Garages" => url_for("garage"),
+        "Items" => url_for("item"),
         "Profile" => url_for('auth/profile.php'),
-        "Admin" => url_for("staff"),
+        "Staff account" => url_for("staff"),
         "Log out" => url_for('auth/logout.php')
     );
 
-    if (!is_admin($_SESSION['user_id'])) {
-        unset($sections['Admin']);
+    if (!is_admin($_SESSION['user_id']) && !is_super_admin($_SESSION['user_id'])) {
+        unset($sections['Staff account']);
     }
 } else {
     $sections = array(
