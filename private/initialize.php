@@ -33,9 +33,9 @@ if ($_ENV['APPLICATION_ENV'] == "PROD") {
 }
 
 //Connect to database
-require_once('database.php');
+require_once('database_functions.php');
 $db = new Database();
 $db->connect();
 
-//Validation functions (requires $db)
-//require_once('validation_functions.php');
+//Validation functions (requires $db to already be set up)
+require_once('validation_functions.php');

@@ -113,14 +113,14 @@ class Database
     public function get_all_users(): array
     {
         $query = <<<SQL
-        SELECT user_id,
-               username,
-               name,
-               email,
-               location.description as location,
-               IFNULL(admin.description, 'User') as access,
-               user.created_at,
-               user.updated_at
+        SELECT  user_id,
+                username,
+                name,
+                email,
+                location.description as location,
+                IFNULL(admin.description, 'User') as access,
+                user.created_at,
+                user.updated_at
         FROM user
         LEFT JOIN location using (location_id)
         LEFT JOIN user_admin using (user_id)
@@ -136,14 +136,14 @@ class Database
         $user_id = $this->escape($user_id);
 
         $query = <<<SQL
-        SELECT user_id,
-               username,
-               name,
-               email,
-               location.description as location,
-               IFNULL(admin.description, 'User') as access,
-               user.created_at,
-               user.updated_at
+        SELECT  user_id,
+                username,
+                name,
+                email,
+                location.description as location,
+                IFNULL(admin.description, 'User') as access,
+                user.created_at,
+                user.updated_at
         FROM user
         LEFT JOIN location using (location_id)
         LEFT JOIN user_admin using (user_id)
@@ -168,6 +168,7 @@ class Database
                username,
                name,
                email,
+               location_id,
                location.description as location,
                user.created_at,
                user.updated_at
@@ -272,24 +273,24 @@ class Database
         }
     }
 
-    /** Get all garage that this user has access to
+    /** Get all garages that this user has access to
      * @param string $user_id
      * @param array $options Owner or Worker
      * @return array
      * TODO Do this as an option in get_garages?
      */
-    public function get_user_garages(string $user_id, array $options = []): array
+    public function get_garages_by_user(string $user_id, array $options = []): array
     {
         $user_id = $this->escape($user_id);
         $access_query = isset($options['access']) ? "AND access.description='" . $this->escape($options['access']) . "'" : '';
         $query = <<<SQL
         SELECT  user_id,
-            garage_id,
-            garage.name,
-            garage.description as description,
-            access.description as access,
-            location.description as location,
-            visible
+                garage_id,
+                garage.name,
+                garage.description as description,
+                access.description as access,
+                location.description as location,
+                visible
         FROM user_garage_access
             LEFT JOIN access using (access_id)
             LEFT JOIN garage using (garage_id)
@@ -301,12 +302,37 @@ class Database
 
         return $this->get_query($query);
     }
+
+    /** Create a new garage
+     * @param array $garage
+     * @return int New ID
+     * @note This does not set ownership or access at all!
+     */
+    public function insert_garage(array $garage): int
+    {
+        $name = $this->escape($garage['name']);
+        $description = $this->escape($garage['description']);
+        $location_id = $this->escape($garage['location_id']);
+        $visible = $this->escape($garage['visible']);
+
+        $query = <<<SQL
+            INSERT INTO garage
+            (name, description, location_id, visible,)
+            VALUES ('$name',
+                    '$description',
+                    '$location_id',
+                    '$visible'
+                    )
+        SQL;
+
+        return $this->insert_query($query);
+    }
     #endregion
 
     #region item
     public function get_all_items(array $options = []): array
     {
-        //TODO Change to AND When WHERE quesy added in?
+        //TODO Change to AND when WHERE query added in?
         $garage_query = isset($options['garage_id']) ? "WHERE garage_id='" . $this->escape($options['garage_id']) . "'" : '';
         $query = <<<SQL
         SELECT  item_id,
@@ -317,10 +343,28 @@ class Database
                 updated_at,
                 created_at
         FROM item
-        {$garage_query}
+            {$garage_query}
         SQL;
 
         return $this->get_query($query);
     }
     #endregion
+
+    #region location
+    /** Get all locations
+     * @return array
+     */
+    public function get_all_locations(): array
+    {
+        $query = <<<SQL
+        SELECT  location_id,
+                name,
+                description
+        FROM location
+    SQL;
+
+        return $this->get_query($query);
+    }
+    #endregion
+
 }

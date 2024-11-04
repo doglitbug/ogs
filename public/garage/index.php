@@ -3,7 +3,7 @@ global $db;
 require_once('../../private/initialize.php');
 require_login();
 
-$garages = $db->get_user_garages($_SESSION['user_id']);
+$garages = $db->get_garages_by_user($_SESSION['user_id']);
 
 $page_title = 'Garages';
 include(SHARED_PATH . '/public_header.php');

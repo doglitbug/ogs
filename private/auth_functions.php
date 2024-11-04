@@ -91,12 +91,16 @@ function require_login(): void
  */
 function log_in(): void
 {
+    //TODO Remove location or location_id
+    //Included here to provide a default location for new garages
+    //TODO Log in by id???
     global $db;
     $user = $db->get_user_by_email($_SESSION['email']);
 
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['username'] = $user['username'];
     $_SESSION['name'] = $user['name'];
+    $_SESSION['location_id'] = $user['location_id'];
     $_SESSION['location'] = $user['location'];
 }
 
