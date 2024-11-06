@@ -195,7 +195,7 @@ class Database
         return $this->get_user_by_email($email) !== [];
     }
 
-    /**
+    /** Check to see if t5his user is Super Admin, Admin or ordinary User
      * @param string $user_id
      * @return string
      */
@@ -255,6 +255,7 @@ class Database
                     name,
                     garage.description,
                     location.description as location,
+                    location.location_id,
                     visible,
                     garage.updated_at,
                     garage.created_at
@@ -277,7 +278,7 @@ class Database
      * @param string $user_id
      * @param array $options Owner or Worker
      * @return array
-     * TODO Do this as an option in get_garages?
+     * TODO Do this as an option/filter in get_all_garages?
      */
     public function get_garages_by_user(string $user_id, array $options = []): array
     {
@@ -317,7 +318,7 @@ class Database
 
         $query = <<<SQL
             INSERT INTO garage
-            (name, description, location_id, visible,)
+            (name, description, location_id, visible)
             VALUES ('$name',
                     '$description',
                     '$location_id',
@@ -327,10 +328,37 @@ class Database
 
         return $this->insert_query($query);
     }
-    #endregion
 
-    #region item
-    public function get_all_items(array $options = []): array
+    /** Update and existing garage
+     * @param array $garage
+     * @return void
+     */
+    public function update_garage(array $garage): void
+    {
+        $garage_id = $this->escape($garage['garage_id']);
+        $name = $this->escape($garage['name']);
+        $description = $this->escape($garage['description']);
+        $location_id = $this->escape($garage['location_id']);
+        $visible = $this->escape($garage['visible']);
+
+        $query = <<<SQL
+            UPDATE garage SET
+                name = '$name',
+                description = '$description',
+                location_id = '$location_id',
+                visible = '$visible'
+            WHERE garage_id = '$garage_id'
+            LIMIT 1
+        SQL;
+
+        $this->update_query($query);
+    }
+
+#endregion
+
+#region item
+    public
+    function get_all_items(array $options = []): array
     {
         //TODO Change to AND when WHERE query added in?
         $garage_query = isset($options['garage_id']) ? "WHERE garage_id='" . $this->escape($options['garage_id']) . "'" : '';
@@ -348,23 +376,58 @@ class Database
 
         return $this->get_query($query);
     }
-    #endregion
 
-    #region location
+#endregion
+
+#region location
     /** Get all locations
      * @return array
      */
-    public function get_all_locations(): array
+    public
+    function get_all_locations(): array
     {
         $query = <<<SQL
         SELECT  location_id,
-                name,
                 description
         FROM location
+        ORDER BY description
     SQL;
 
         return $this->get_query($query);
     }
-    #endregion
 
+#endregion
+
+#region user_garage_access
+    /** Set access for user to garage
+     * @param string $user_id
+     * @param string $garage_id
+     * @param string $access
+     * @return void
+     * @todo Change access to int instead of string, check to see if access already exists?
+     */
+    public
+    function set_user_garage_access(string $user_id, string $garage_id, string $access): void
+    {
+        $user_id = $this->escape($user_id);
+        $garage_id = $this->escape($garage_id);
+        $access = $this->escape($access);
+
+        $query = <<<SQL
+        INSERT INTO user_garage_access
+            (user_id, garage_id, access_id)
+            VALUES ('$user_id',
+                    '$garage_id',
+                    (SELECT access_id FROM access WHERE description = '$access'))
+        SQL;
+
+        $this->insert_query($query);
+    }
+
+    public
+    function get_user_access()
+    {
+
+    }
+#endregion
 }

@@ -14,6 +14,10 @@ include(SHARED_PATH . '/public_header.php');
 
     <div id="content">
         <h1><?php echo $page_title; ?></h1>
+        <div class="cta">
+            TODO Check if we are the owner!
+            <a class="action" href="<?php echo url_for('/garage/delete.php?id=' . h(u($id))); ?>">Delete Garage</a>
+        </div>
         <div>
             <table class="table">
                 <tr>

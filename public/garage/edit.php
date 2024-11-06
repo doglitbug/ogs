@@ -2,11 +2,17 @@
 global $db;
 require_once('../../private/initialize.php');
 require_login();
+//TODO THIS WHOLE PAGE
 
-$locations = $db->get_all_locations();
-$garage = [];
+if (!isset($_GET['id'])) {
+    redirect_to(url_for('/garage/index.php'));
+}
+$garage_id = $_GET['id'];
+//TODO Check ownership of garage
+//require_owner
 
 if (is_post_request()) {
+    $garage['garage_id'] = $garage_id;
     $garage['name'] = $_POST['name'] ?? '';
     $garage['description'] = $_POST['description'] ?? '';
     $garage['location_id'] = $_POST['location'] ?? '';
@@ -15,26 +21,29 @@ if (is_post_request()) {
     $errors = validate_garage($garage);
 
     if (empty($errors)) {
-        $new_id = $db->insert_garage($garage);
-        $db->set_user_garage_access($_SESSION['user_id'], $new_id, "Owner");
-        $_SESSION['message'] = 'Garage created successfully';
-        redirect_to(url_for('/garage/show.php?id=' . $new_id));
+        $db->update_garage($garage);
+        $_SESSION['message'] = 'Garage updated successfully';
+        redirect_to(url_for('/garage/show.php?id=' . $garage_id));
     }
 } else {
-    $garage['name'] = '';
-    $garage['description'] = '';
-    $garage['location_id'] = $_SESSION['location_id'];
-    $garage['visible'] = '1';
+    $garage = $db->get_garage($garage_id);
+    if ($garage == null){
+        $_SESSION['error'] = 'Invalid Garage ID';
+        redirect_to(url_for('/garage/index.php'));
+    }
 }
 
-$garage_title = 'Add Garage';
+$locations = $db->get_all_locations();
+
+
+$page_title = 'Edit Garage';
 include(SHARED_PATH . '/public_header.php');
 ?>
 
     <div id="content">
-        <h1><?php echo $garage_title; ?></h1>
+        <h1><?php echo $page_title; ?></h1>
 
-        <form action="<?php echo url_for('/garage/create.php'); ?>" method="post">
+        <form action="<?php echo url_for('/garage/edit.php?id='. h(u($garage_id))); ?>" method="post">
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" class="form-control" placeholder="Garage name" aria-label="Garage name" name="name"
@@ -79,7 +88,7 @@ include(SHARED_PATH . '/public_header.php');
             </div>
 
             <div id="operations">
-                <button type="submit" class="btn btn-primary">Create Garage</button>
+                <button type="submit" class="btn btn-primary">Edit Garage</button>
             </div>
         </form>
     </div>

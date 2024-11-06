@@ -1,4 +1,7 @@
 <?php
+
+use JetBrains\PhpStorm\NoReturn;
+
 /** Generate URL from WWW_ROOT + $script_path
  * @param string $script_path input
  * @return string output
@@ -41,7 +44,7 @@ function h(?string $string = ""): string
 
 /** Return a 404 error
  */
-function error_404(): void
+#[NoReturn] function error_404(): void
 {
     header($_SERVER["SERVER_PROTOCOL"] . " 404 Page Not Found");
     exit();
@@ -49,7 +52,7 @@ function error_404(): void
 
 /** Return a 500 error
  */
-function error_500(): void
+#[NoReturn] function error_500(): void
 {
     header($_SERVER["SERVER_PROTOCOL"] . " 500 Internal Server Error");
     exit();
@@ -57,7 +60,7 @@ function error_500(): void
 
 /** Return a generic database error
  */
-function error_database(string $error_message = "Unspecified Database Error"): void
+#[NoReturn] function error_database(string $error_message = "Unspecified Database Error"): void
 {
     header($_SERVER["SERVER_PROTOCOL"] . " 500 " . $error_message);
     exit();
@@ -66,7 +69,7 @@ function error_database(string $error_message = "Unspecified Database Error"): v
 /** Return a 302 redirect to the provided location
  * @param string $location url to redirect to
  */
-function redirect_to(string $location): void
+#[NoReturn] function redirect_to(string $location): void
 {
     header('Location: ' . $location);
     exit;

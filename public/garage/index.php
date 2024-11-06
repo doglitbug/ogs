@@ -14,6 +14,9 @@ include(SHARED_PATH . '/public_header.php');
         <p>These are the garages you have access to: as an owner or worker.<br>
             Free accounts are limited to 1 garage each with up to 2 workers.
         </p>
+        <div class="cta">
+            <a class="action" href="<?php echo url_for('/garage/create.php'); ?>">Create new Garage</a>
+        </div>
         <div>
             <table class="table">
                 <tr>
