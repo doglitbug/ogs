@@ -1,7 +1,6 @@
 <?php
 global $db;
 require_once('../../private/initialize.php');
-require_login();
 
 $page_title = 'Items';
 include(SHARED_PATH . '/public_header.php');

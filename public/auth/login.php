@@ -1,7 +1,6 @@
 <?php
 global $db;
 require_once('../../private/initialize.php');
-//TODO Check if already logged in, ask if want to log out?
 
 $page_title = 'Log in';
 include(SHARED_PATH . '/public_header.php');

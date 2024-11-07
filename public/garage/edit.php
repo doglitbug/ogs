@@ -7,8 +7,11 @@ if (!isset($_GET['id'])) {
     redirect_to(url_for('/garage/index.php'));
 }
 $garage_id = $_GET['id'];
-//TODO Check ownership of garage
-//require_owner
+
+if (!is_owner($_SESSION['user_id'], $garage_id)) {
+    $_SESSION['error'] = 'You do not have authority to edit that garage';
+    redirect_to(url_for('/garage/index.php'));
+}
 
 if (is_post_request()) {
     $garage['garage_id'] = $garage_id;
@@ -26,8 +29,8 @@ if (is_post_request()) {
     }
 } else {
     $garage = $db->get_garage($garage_id);
-    if ($garage == null){
-        $_SESSION['error'] = 'Invalid Garage ID';
+    if ($garage == null) {
+        $_SESSION['error'] = 'Garage not found';
         redirect_to(url_for('/garage/index.php'));
     }
 }
@@ -41,11 +44,12 @@ include(SHARED_PATH . '/public_header.php');
     <div id="content">
         <h1><?php echo $page_title; ?></h1>
 
-    <div class="cta">
-        <a class="btn btn-primary action" href="<?php echo url_for('/garage/show.php?id='.h(u($garage['garage_id']))); ?>">Back</a>
-    </div>
+        <div class="cta">
+            <a class="btn btn-primary action"
+               href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>">Back</a>
+        </div>
 
-        <form action="<?php echo url_for('/garage/edit.php?id='. h(u($garage_id))); ?>" method="post">
+        <form action="<?php echo url_for('/garage/edit.php?id=' . h(u($garage_id))); ?>" method="post">
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" class="form-control" placeholder="Garage name" aria-label="Garage name" name="name"

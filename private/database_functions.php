@@ -222,11 +222,14 @@ class Database
     #endregion
 
     #region garage
-    /** Get all garage
+    /** Get all garages
+     * @param array $options
      * @return array
      */
-    public function get_all_garages(): array
+    public function get_all_garages(array $options = []): array
     {
+        $visible_query = isset($options['visible']) ? "WHERE visible = '" . $this->escape($options['visible']) . "'" : "";
+
         $query = <<<SQL
             SELECT  garage_id,
                     name,
@@ -237,6 +240,7 @@ class Database
                     garage.created_at
             FROM garage
             LEFT JOIN location using (location_id)
+            {$visible_query}
         SQL;
 
         return $this->get_query($query);
@@ -354,11 +358,27 @@ class Database
         $this->update_query($query);
     }
 
+    /** Delete garage, this assumes that this action has only been called by user with authority etc
+     * user_garage_access rows will be deleted automatically!
+     * @param array $garage
+     * @return void
+     */
+    public function delete_garage(array $garage):void{
+        $garage_id = $this->escape($garage['garage_id']);
+
+        $query = <<<SQL
+            DELETE FROM garage
+            WHERE garage_id = '$garage_id'
+            LIMIT 1;
+        SQL;
+
+        $this->delete_query($query);
+    }
+
 #endregion
 
 #region item
-    public
-    function get_all_items(array $options = []): array
+    public function get_all_items(array $options = []): array
     {
         //TODO Change to AND when WHERE query added in?
         $garage_query = isset($options['garage_id']) ? "WHERE garage_id='" . $this->escape($options['garage_id']) . "'" : '';

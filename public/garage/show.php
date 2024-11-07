@@ -1,11 +1,14 @@
 <?php
 global $db;
 require_once('../../private/initialize.php');
-require_login();
 
 $id = $_GET['id'] ?? '1';
 
 $garage = $db->get_garage($id);
+if ($garage == null) {
+    $_SESSION['error'] = 'Garage not found';
+    redirect_to(url_for('/garage/index.php'));
+}
 $items = $db->get_all_items(['garage_id' => $garage['garage_id']]);
 
 $page_title = 'Garage';
@@ -14,12 +17,13 @@ include(SHARED_PATH . '/public_header.php');
 
     <div id="content">
         <h1><?php echo $page_title; ?></h1>
+
         <div class="cta">
             <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>">Back</a>
-            <?php if (is_owner($_SESSION['user_id'], $garage['garage_id'])) {
-                ?>
+            <?php if (is_logged_in() && is_owner($_SESSION['user_id'], $garage['garage_id'])) { ?>
                 <a class="btn btn-primary action"
-                   href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">Edit Garage</a>
+                   href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">Edit
+                    Garage</a>
                 <a class="btn btn-primary action"
                    href="<?php echo url_for('/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>">Delete
                     Garage</a>
@@ -44,10 +48,15 @@ include(SHARED_PATH . '/public_header.php');
         </div>
 
         <h1>Items</h1>
-        <div class="cta">
-            <a class="btn btn-primary action"
-               href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>">Add Items</a>
-        </div>
+        <?php if (is_logged_in() && (is_owner($_SESSION['user_id'], $garage['garage_id']) || is_worker($_SESSION['user_id'], $garage['garage_id']))) {
+            ?>
+            <div class="cta">
+                <a class="btn btn-primary action"
+                   href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>">Add
+                    Items</a>
+            </div>
+        <?php } ?>
+
         <div>
             <table class="table">
                 <tr>

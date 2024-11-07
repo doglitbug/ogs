@@ -1,21 +1,16 @@
 <?php
-if (is_logged_in()) {
-    $sections = array(
-        "Garages" => url_for("garage"),
-        "Items" => url_for("item"),
-        "Profile" => url_for('auth/profile.php'),
-        "Staff account" => url_for("staff"),
-        "Log out" => url_for('auth/logout.php')
-    );
+$sections['Garages'] = url_for("garage");
+$sections['Items'] = url_for("item");
 
-    if (!is_admin($_SESSION['user_id']) && !is_super_admin($_SESSION['user_id'])) {
-        unset($sections['Staff account']);
+if (is_logged_in()) {
+    if (is_admin($_SESSION['user_id']) || is_super_admin($_SESSION['user_id'])) {
+        $sections['Staff account'] = url_for("staff");
     }
+    $sections['Profile'] = url_for('auth/profile.php');
+    $sections['Log out'] = url_for('auth/logout.php');
 } else {
-    $sections = array(
-            "Log in" => url_for("auth/login.php"),
-            "Log in as" => url_for("auth/deleteme.php")
-        );
+    $sections['Log in'] = url_for("auth/login.php");
+    $sections['Log in as'] = url_for("auth/deleteme.php");
 }
 
 //Get from current URL
@@ -49,13 +44,11 @@ $current = basename(dirname($_SERVER['PHP_SELF']));
                 }
                 ?>
             </ul>
-            <?php if (is_logged_in()) {
-                ?>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            <?php } ?>
+
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
         </div>
     </div>
 </nav>
