@@ -371,13 +371,18 @@ class Database
             WHERE garage_id = '$garage_id'
             LIMIT 1;
         SQL;
-
+        dump($query);
         $this->delete_query($query);
     }
 
 #endregion
 
 #region item
+    /** Get items, usually from an individual garage
+     * @param array $options garage_id
+     * @return array
+     * @todo rename this to get_garage_items($garage_id) if we never use it without the option
+     */
     public function get_all_items(array $options = []): array
     {
         //TODO Change to AND when WHERE query added in?

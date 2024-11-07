@@ -94,7 +94,7 @@ include(SHARED_PATH . '/public_header.php');
             </div>
 
             <div id="operations">
-                <button type="submit" class="btn btn-primary">Edit Garage</button>
+                <button type="submit" class="btn btn-warning">Edit Garage</button>
             </div>
         </form>
     </div>

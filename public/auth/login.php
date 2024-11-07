@@ -17,14 +17,12 @@ include(SHARED_PATH . '/public_header.php');
                 <i class="bi bi-google"></i> Log in with Google
             </a>
             <br>
-            <a class="btn btn-social btn-facebook disabled" href="<?php echo url_for("auth/facebook-oauth.php"); ?>" role="button">
+            <a class="btn btn-social btn-facebook disabled" href="<?php echo url_for("auth/facebook-oauth.php"); ?>"
+               role="button">
                 <i class="bi bi-facebook"></i> Log in with FaceBook
             </a>
         </div>
-
-        <?php
-    }
-    ?>
+    <?php } ?>
 </div>
 
 <?php include(SHARED_PATH . '/public_footer.php'); ?>

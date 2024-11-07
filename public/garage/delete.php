@@ -16,14 +16,20 @@ if ($garage == null) {
 
 if (!is_owner($_SESSION['user_id'], $garage_id)) {
     $_SESSION['error'] = 'You do not have authority to delete that garage';
-    redirect_to(url_for('/garage/show.php?id='.h(u($garage['garage_id']))));
+    redirect_to(url_for('/garage/show.php?id=' . h(u($garage['garage_id']))));
 }
 
 if (is_post_request()) {
-    //TODO Check for last owner, zero items etc otherwise we end up with floating items?
-    $db->delete_garage($garage);
-    $_SESSION['message'] = 'Garage deleted successfully';
-    redirect_to(url_for('/garage/index.php'));
+    //TODO Check for last owner
+    $item_count = count($db->get_all_items(['garage_id' => $garage['garage_id']]));
+    if ($item_count != 0) {
+        $_SESSION['error'] = 'Garage must be empty to delete';
+    } else {
+        $db->delete_garage($garage);
+        $_SESSION['message'] = 'Garage deleted successfully';
+        $db->disconnect();
+        redirect_to(url_for('/garage/index.php'));
+    }
 }
 
 $page_title = 'Delete Garage';

@@ -21,10 +21,10 @@ include(SHARED_PATH . '/public_header.php');
         <div class="cta">
             <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>">Back</a>
             <?php if (is_logged_in() && is_owner($_SESSION['user_id'], $garage['garage_id'])) { ?>
-                <a class="btn btn-primary action"
+                <a class="btn btn-warning action"
                    href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">Edit
                     Garage</a>
-                <a class="btn btn-primary action"
+                <a class="btn btn-danger action"
                    href="<?php echo url_for('/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>">Delete
                     Garage</a>
             <?php } ?>
@@ -51,7 +51,7 @@ include(SHARED_PATH . '/public_header.php');
         <?php if (is_logged_in() && (is_owner($_SESSION['user_id'], $garage['garage_id']) || is_worker($_SESSION['user_id'], $garage['garage_id']))) {
             ?>
             <div class="cta">
-                <a class="btn btn-primary action"
+                <a class="btn btn-success action"
                    href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>">Add
                     Items</a>
             </div>
