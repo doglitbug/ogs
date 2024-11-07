@@ -15,9 +15,17 @@ include(SHARED_PATH . '/public_header.php');
     <div id="content">
         <h1><?php echo $page_title; ?></h1>
         <div class="cta">
-            TODO Check if we are the owner!
-            <a class="action" href="<?php echo url_for('/garage/delete.php?id=' . h(u($id))); ?>">Delete Garage</a>
+            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>">Back</a>
+            <?php if (is_owner($_SESSION['user_id'], $garage['garage_id'])) {
+                ?>
+                <a class="btn btn-primary action"
+                   href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">Edit Garage</a>
+                <a class="btn btn-primary action"
+                   href="<?php echo url_for('/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>">Delete
+                    Garage</a>
+            <?php } ?>
         </div>
+
         <div>
             <table class="table">
                 <tr>
@@ -36,6 +44,10 @@ include(SHARED_PATH . '/public_header.php');
         </div>
 
         <h1>Items</h1>
+        <div class="cta">
+            <a class="btn btn-primary action"
+               href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>">Add Items</a>
+        </div>
         <div>
             <table class="table">
                 <tr>

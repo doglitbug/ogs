@@ -17,6 +17,7 @@ define("WWW_ROOT", $doc_root);
 
 require_once('http_functions.php');
 require_once('auth_functions.php');
+require_once('access_functions.php');
 
 //Load Environment variables
 require_once('DotEnv.php');

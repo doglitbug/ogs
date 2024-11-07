@@ -32,3 +32,14 @@ a.btn-facebook {
     margin-right: auto;
     text-align: center;
 }
+
+.cta {
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: black;
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 15px;
+    background-color: white;
+}

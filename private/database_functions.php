@@ -424,10 +424,28 @@ class Database
         $this->insert_query($query);
     }
 
-    public
-    function get_user_access()
+    /** Find this users access level for this garage
+     * @param string $user_id
+     * @param string $garage_id
+     * @return string Owner|Worker|User
+     */
+    public function get_user_access(string $user_id, string $garage_id): string
     {
+        $user_id = $this->escape($user_id);
+        $garage_id = $this->escape($garage_id);
 
+        $query = <<<SQL
+            SELECT IFNULL((
+                SELECT description
+                FROM user_garage_access
+                LEFT JOIN access using (access_id)
+                WHERE user_id='$user_id'
+                AND garage_id='$garage_id'
+                LIMIT 1),
+            "User") access;
+        SQL;
+
+        return $this->get_query($query)[0]['access'];
     }
 #endregion
 }

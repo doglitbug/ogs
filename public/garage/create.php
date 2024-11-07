@@ -34,6 +34,14 @@ include(SHARED_PATH . '/public_header.php');
     <div id="content">
         <h1><?php echo $garage_title; ?></h1>
 
+        <div class="cta">
+            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>">Back</a>
+        </div>
+
+        <p>
+            Creating a garage is the first step to getting up and running!<br/>
+            Please fill out the form below and click 'Create Garage' to continue!
+        </p>
         <form action="<?php echo url_for('/garage/create.php'); ?>" method="post">
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>

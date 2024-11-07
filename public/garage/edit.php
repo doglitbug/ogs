@@ -2,7 +2,6 @@
 global $db;
 require_once('../../private/initialize.php');
 require_login();
-//TODO THIS WHOLE PAGE
 
 if (!isset($_GET['id'])) {
     redirect_to(url_for('/garage/index.php'));
@@ -35,13 +34,16 @@ if (is_post_request()) {
 
 $locations = $db->get_all_locations();
 
-
 $page_title = 'Edit Garage';
 include(SHARED_PATH . '/public_header.php');
 ?>
 
     <div id="content">
         <h1><?php echo $page_title; ?></h1>
+
+    <div class="cta">
+        <a class="btn btn-primary action" href="<?php echo url_for('/garage/show.php?id='.h(u($garage['garage_id']))); ?>">Back</a>
+    </div>
 
         <form action="<?php echo url_for('/garage/edit.php?id='. h(u($garage_id))); ?>" method="post">
             <div class="mb-3">
