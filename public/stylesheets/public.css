@@ -16,7 +16,7 @@ a.btn-social {
     border-radius: 10px;
     border-color: black;
     min-width: 200px;
-    margin: 5px;
+    margin: 6px;
 }
 
 a.btn-google {
@@ -42,4 +42,13 @@ a.btn-facebook {
     padding: 5px;
     margin-bottom: 15px;
     background-color: white;
+}
+
+div.row {
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+div.form-check {
+    padding-top: 15px;
 }

@@ -35,7 +35,8 @@ include(SHARED_PATH . '/public_header.php');
         </div>
 
         <div>
-            <table class="table">
+            <table class="table table-hover">
+                <thead>
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
@@ -44,6 +45,8 @@ include(SHARED_PATH . '/public_header.php');
                         <th>Visible to public?</th>
                     <?php } ?>
                 </tr>
+                </thead>
+                <tbody>
                 <tr>
                     <td><?php echo h($garage['name']); ?></td>
                     <td><?php echo h($garage['description']); ?></td>
@@ -52,6 +55,7 @@ include(SHARED_PATH . '/public_header.php');
                         <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                     <?php } ?>
                 </tr>
+                </tbody>
             </table>
         </div>
 
@@ -66,7 +70,8 @@ include(SHARED_PATH . '/public_header.php');
         <?php } ?>
 
         <div>
-            <table class="table">
+            <table class="table table-hover">
+                <thead>
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
@@ -74,6 +79,8 @@ include(SHARED_PATH . '/public_header.php');
                         <th>Visible</th>
                     <?php } ?>
                 </tr>
+                </thead>
+                <tbody>
                 <?php foreach ($items as $item) {
                     if ($item['visible'] == '0' && !can_edit_item($item)) continue;
                     ?>
@@ -87,6 +94,7 @@ include(SHARED_PATH . '/public_header.php');
                         <?php } ?>
                     </tr>
                 <?php } ?>
+                </tbody>
             </table>
         </div>
     </div>

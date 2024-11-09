@@ -34,7 +34,8 @@ include(SHARED_PATH . '/public_header.php');
         </div>
 
         <div>
-            <table class="table">
+            <table class="table table-hover">
+                <thead>
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
@@ -42,6 +43,8 @@ include(SHARED_PATH . '/public_header.php');
                         <th>Visible to public?</th>
                     <?php } ?>
                 </tr>
+                </thead>
+                <tbody>
                 <tr>
                     <td><?php echo h($item['name']); ?></td>
                     <td><?php echo h($item['description']); ?></td>
@@ -49,6 +52,7 @@ include(SHARED_PATH . '/public_header.php');
                         <td><?php echo $item['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                     <?php } ?>
                 </tr>
+                </tbody>
             </table>
         </div>
     </div>

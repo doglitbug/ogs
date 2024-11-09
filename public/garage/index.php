@@ -23,13 +23,16 @@ include(SHARED_PATH . '/public_header.php');
         <?php if (is_logged_in()) { ?>
             <h1>My garages</h1>
             <div>
-                <table class="table">
+                <table class="table table-hover">
+                    <thead>
                     <tr>
                         <th>Name</th>
                         <th>Description</th>
                         <th>Location</th>
                         <th>Visible to public?</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     <?php foreach (array_filter($my_garages, function ($g) {
                         return $g['access'] == "Owner";
                     }) as $garage) { ?>
@@ -42,18 +45,22 @@ include(SHARED_PATH . '/public_header.php');
                             <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                         </tr>
                     <?php } ?>
+                    </tbody>
                 </table>
             </div>
 
             <h1>Shared garages</h1>
             <div>
-                <table class="table">
+                <table class="table table-hover">
+                    <thead>
                     <tr>
                         <th>Name</th>
                         <th>Description</th>
                         <th>Location</th>
                         <th>Visible to public?</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     <?php foreach (array_filter($my_garages, function ($g) {
                         return $g['access'] == "Worker";
                     }) as $garage) { ?>
@@ -66,18 +73,22 @@ include(SHARED_PATH . '/public_header.php');
                             <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                         </tr>
                     <?php } ?>
+                    </tbody>
                 </table>
             </div>
 
         <?php } ?>
         <div>
             <h1>Public garages</h1>
-            <table class="table">
+            <table class="table table-hover">
+                <thead>
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Location</th>
                 </tr>
+                </thead>
+                <tbody>
                 <?php foreach ($public_garages as $garage) { ?>
                     <tr>
                         <td><a class="action"
@@ -87,6 +98,7 @@ include(SHARED_PATH . '/public_header.php');
                         <td><?php echo h($garage['location']); ?></td>
                     </tr>
                 <?php } ?>
+                </tbody>
             </table>
         </div>
     </div>

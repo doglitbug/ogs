@@ -44,35 +44,41 @@ include(SHARED_PATH . '/public_header.php');
         </div>
 
         <form action="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>" method="post">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" placeholder="Item name" aria-label="Item name" name="name"
-                       value="<?php echo h($item['name']); ?>">
-                <?php if (isset($errors['name'])) {
-                    echo '<div class="text-danger">' . $errors['name'] . '</div>';
-                } ?>
+            <div class="row">
+                <div class="col-xl-6">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" placeholder="Item name" aria-label="Item name" name="name"
+                           value="<?php echo h($item['name']); ?>">
+                    <?php if (isset($errors['name'])) {
+                        echo '<div class="text-danger">' . $errors['name'] . '</div>';
+                    } ?>
+                </div>
+                <div class="col-xl-6">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" class="form-control" placeholder="Item description" aria-label="Description"
+                           name="description"
+                           value="<?php echo h($item['description']); ?>">
+                    <?php if (isset($errors['description'])) {
+                        echo '<div class="text-danger">' . $errors['description'] . '</div>';
+                    } ?>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <input type="text" class="form-control" placeholder="Item description" aria-label="Description"
-                       name="description"
-                       value="<?php echo h($item['description']); ?>">
-                <?php if (isset($errors['description'])) {
-                    echo '<div class="text-danger">' . $errors['description'] . '</div>';
-                } ?>
+            <div class="row">
+                <div class="col-xl-6">
+                    <div class="form-check form-switch">
+                        <input type="hidden" name="visible" value="0"/>
+                        <input class="form-check-input" type="checkbox" name="visible" value="1"
+                               id="visible" <?php if ($item['visible'] == 1) echo "checked"; ?>>
+                        <label class="form-check-label" for="visible">
+                            Visible to public?
+                        </label>
+                    </div>
+                </div>
             </div>
-
-            <div class="mb-3">
-                <input type="hidden" name="visible" value="0"/>
-                <input class="form-check-input" type="checkbox" name="visible" value="1"
-                       id="visible" <?php if ($item['visible'] == 1) echo "checked"; ?>>
-                <label class="form-check-label" for="visible">
-                    Visible to public?
-                </label>
-            </div>
-
-            <div id="operations">
-                <button type="submit" class="btn btn-warning">Edit Item</button>
+            <div class="row">
+                <div id="operations">
+                    <button type="submit" class="btn btn-warning">Edit Item</button>
+                </div>
             </div>
         </form>
     </div>
