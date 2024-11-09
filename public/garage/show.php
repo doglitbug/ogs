@@ -75,7 +75,7 @@ include(SHARED_PATH . '/public_header.php');
                     <?php } ?>
                 </tr>
                 <?php foreach ($items as $item) {
-                    if ($item['visible'] == '0' && !can_edit_item($item)) break;
+                    if ($item['visible'] == '0' && !can_edit_item($item)) continue;
                     ?>
                     <tr>
                         <td>

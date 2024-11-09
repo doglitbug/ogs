@@ -2,7 +2,7 @@
 global $db;
 require_once('../../private/initialize.php');
 
-$garages = $db->get_all_garages(['visible' => '1']);
+$public_garages = $db->get_all_garages(['visible' => '1']);
 $my_garages = [];
 if (is_logged_in()) {
     $my_garages = $db->get_garages_by_user($_SESSION['user_id']);
@@ -78,7 +78,7 @@ include(SHARED_PATH . '/public_header.php');
                     <th>Description</th>
                     <th>Location</th>
                 </tr>
-                <?php foreach ($garages as $garage) { ?>
+                <?php foreach ($public_garages as $garage) { ?>
                     <tr>
                         <td><a class="action"
                                href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>">
