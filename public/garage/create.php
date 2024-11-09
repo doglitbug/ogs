@@ -3,7 +3,6 @@ global $db;
 require_once('../../private/initialize.php');
 require_login();
 
-$locations = $db->get_all_locations();
 $garage = [];
 
 if (is_post_request()) {
@@ -26,6 +25,8 @@ if (is_post_request()) {
     $garage['location_id'] = $_SESSION['location_id'];
     $garage['visible'] = '1';
 }
+
+$locations = $db->get_all_locations();
 
 $garage_title = 'Add Garage';
 include(SHARED_PATH . '/public_header.php');

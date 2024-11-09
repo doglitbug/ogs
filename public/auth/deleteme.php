@@ -10,7 +10,6 @@ if (is_post_request()) {
     $_SESSION['email'] = $_POST['email'];
     $_SESSION['logon_method'] = "Impersonation";
     log_in();
-    $db->disconnect();
     redirect_to(url_for('auth/profile.php'));
 }
 

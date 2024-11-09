@@ -16,7 +16,6 @@ include(SHARED_PATH . '/public_header.php');
         <?php if (is_logged_in()) { ?>
             <h1><?php echo $page_title; ?></h1>
             <div class="cta">
-                <a class="btn btn-primary action" href="javascript:history.back()">Back</a>
                 <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>">Create new
                     Garage</a>
             </div>

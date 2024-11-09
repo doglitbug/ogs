@@ -2,10 +2,10 @@
 global $db;
 require_once('../../private/initialize.php');
 
-$id = $_GET['id'] ?? '1';
+$id = $_GET['id'] ?? '0';
 
 $garage = $db->get_garage($id);
-if ($garage == null || ($garage['visible'] == '0' && !can_edit_items($garage))) {
+if ($garage == null || ($garage['visible'] == '0' && !is_owner_or_worker($garage))) {
     $_SESSION['error'] = 'Garage not found';
     redirect_to(url_for('/garage/index.php'));
 }
@@ -19,7 +19,11 @@ include(SHARED_PATH . '/public_header.php');
         <h1><?php echo $page_title; ?></h1>
 
         <div class="cta">
-            <a class="btn btn-primary action" href="javascript:history.back()">Back</a>
+            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>">Back</a>
+            <?php if (is_logged_in()) { ?>
+                <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>">Create new
+                    Garage</a>
+            <?php } ?>
             <?php if (is_owner($garage['garage_id'])) { ?>
                 <a class="btn btn-warning action"
                    href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">Edit
@@ -48,7 +52,7 @@ include(SHARED_PATH . '/public_header.php');
         </div>
 
         <h1>Items</h1>
-        <?php if (can_edit_items($garage)) {
+        <?php if (is_owner_or_worker($garage)) {
             ?>
             <div class="cta">
                 <a class="btn btn-success action"

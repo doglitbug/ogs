@@ -109,7 +109,7 @@ function has_valid_email(string $value): bool
 
 #endregion
 
-#region Garage
+#region validation
 function validate_garage(array $garage): array
 {
     global $db;
@@ -139,6 +139,34 @@ function validate_garage(array $garage): array
 
     #visible
     $visible_str = (string)$garage['visible'];
+    if (!has_inclusion_of($visible_str, ["0", "1"])) {
+        $errors['visible'] = "Visible must be true or false";
+    }
+
+    return $errors;
+}
+
+function validate_item(array $item): array
+{
+    global $db;
+    $errors = [];
+
+    #name
+    if (is_blank($item['name'])) {
+        $errors['name'] = "Name cannot be blank";
+    } else if (!has_length($item['name'], ['min' => 2, 'max' => 255])) {
+        $errors['name'] = "Name must be between 2 and 255 characters";
+    }
+
+    #description
+    if (is_blank($item['description'])) {
+        $errors['description'] = "Description cannot be blank";
+    } else if (!has_length($item['description'], ['min' => 2, 'max' => 255])) {
+        $errors['description'] = "Description must be between 2 and 255 characters";
+    }
+
+    #visible
+    $visible_str = (string)$item['visible'];
     if (!has_inclusion_of($visible_str, ["0", "1"])) {
         $errors['visible'] = "Visible must be true or false";
     }

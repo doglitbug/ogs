@@ -6,6 +6,7 @@ $id = $_GET['id'] ?? '1';
 
 $item = $db->get_item($id);
 if ($item == null || ($item['visible'] == '0' && !can_edit_item($item))) {
+    //TODO Check if garage is hidden
     $_SESSION['error'] = 'Item not found';
     redirect_to(url_for('/item/index.php'));
 }
@@ -18,7 +19,8 @@ include(SHARED_PATH . '/public_header.php');
         <h1><?php echo $page_title; ?></h1>
 
         <div class="cta">
-            <a class="btn btn-primary action" href="javascript:history.back()">Back</a>
+            <a class="btn btn-primary action"
+               href="<?php echo url_for('/garage/show.php?id=' . h(u($item['garage_id']))); ?>">Back</a>
             <?php if (can_edit_item($item)) {
                 ?>
                 <a class="btn btn-warning action"

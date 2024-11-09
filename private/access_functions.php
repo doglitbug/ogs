@@ -97,14 +97,13 @@ function is_worker(string $garage_id): bool
  * @param array $garage
  * @return bool
  */
-function can_edit_items(array $garage): bool {
+function is_owner_or_worker(array $garage): bool {
     if (!is_logged_in()) return false;
 
     return (is_owner($garage['garage_id']) || is_worker($garage['garage_id']));
 }
 
 /** Is the current user an owner or worker of the item?
- * If no user logged in, return false
  * @param array $item
  * @return bool
  */

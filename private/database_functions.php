@@ -31,6 +31,7 @@ class Database
      */
     public function escape(string $string): string
     {
+        $string = filter_var($string, FILTER_UNSAFE_RAW, FILTER_FLAG_ENCODE_LOW | FILTER_FLAG_STRIP_HIGH);
         return $this->connection->real_escape_string($string);
     }
 
@@ -362,7 +363,8 @@ class Database
      * @param array $garage
      * @return void
      */
-    public function delete_garage(array $garage):void{
+    public function delete_garage(array $garage): void
+    {
         $garage_id = $this->escape($garage['garage_id']);
 
         $query = <<<SQL
@@ -401,8 +403,13 @@ class Database
         return $this->get_query($query);
     }
 
-    public function get_item(string $item_id, array $options = []):array{
-
+    /** Get an individual item, usually for show/edit item
+     * @param string $item_id
+     * @param array $options
+     * @return array
+     */
+    public function get_item(string $item_id, array $options = []): array
+    {
         $item_id = $this->escape($item_id);
 
         $query = <<<SQL
@@ -425,6 +432,67 @@ class Database
 
         return $this->get_query($query);
     }
+
+    /** Insert a new item
+     * @param array $item
+     * @return int
+     */
+    public function insert_item(array $item): int
+    {
+        $garage_id = $this->escape($item['garage_id']);
+        $name = $this->escape($item['name']);
+        $description = $this->escape($item['description']);
+        $visible = $this->escape($item['visible']);
+
+        $query = <<<SQL
+            INSERT INTO item
+            (garage_id, name, description, visible)
+            VALUES  ('$garage_id',
+                    '$name',
+                    '$description',
+                    '$visible'
+                    )
+        SQL;
+
+        return $this->insert_query($query);
+    }
+
+    public function update_item(array $item): void
+    {
+        $item_id = $this->escape($item['item_id']);
+        $garage_id = $this->escape($item['item_id']);
+        $name = $this->escape($item['name']);
+        $description = $this->escape($item['description']);
+        $visible = $this->escape($item['visible']);
+
+        $query = <<<SQL
+        UPDATE item SET name = '$name',
+                        description = '$description',
+                        visible = '$visible'
+        WHERE item_id = '$item_id'
+        LIMIT 1
+        SQL;
+
+        $this->update_query($query);
+    }
+
+    /** Delete an item
+     * @todo Remove all images as well?
+     * @param array $item
+     * @return void
+     */
+    public function delete_item(array $item): void{
+        $item_id = $this->escape($item['item_id']);
+
+        $query = <<<SQL
+        DELETE FROM item
+        WHERE item_id = '$item_id'
+        LIMIT 1;
+        SQL;
+
+        $this->delete_query($query);
+    }
+
 
 #endregion
 

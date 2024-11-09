@@ -3,18 +3,21 @@ global $db;
 require_once('../../private/initialize.php');
 require_login();
 
-if (!isset($_GET['id'])) {
+$id = $_GET['id'] ?? '0';
+
+$garage = $db->get_garage($id);
+if ($garage == null) {
+    $_SESSION['error'] = 'Garage not found';
     redirect_to(url_for('/garage/index.php'));
 }
-$garage_id = $_GET['id'];
 
-if (!is_owner($garage_id)) {
+if (!is_owner($garage['garage_id'])) {
     $_SESSION['error'] = 'You do not have authority to edit that garage';
     redirect_to(url_for('/garage/index.php'));
 }
 
 if (is_post_request()) {
-    $garage['garage_id'] = $garage_id;
+    $garage['garage_id'] = $garage['garage_id'];
     $garage['name'] = $_POST['name'] ?? '';
     $garage['description'] = $_POST['description'] ?? '';
     $garage['location_id'] = $_POST['location'] ?? '';
@@ -25,14 +28,10 @@ if (is_post_request()) {
     if (empty($errors)) {
         $db->update_garage($garage);
         $_SESSION['message'] = 'Garage updated successfully';
-        redirect_to(url_for('/garage/show.php?id=' . $garage_id));
+        redirect_to(url_for('/garage/show.php?id=' . $garage['garage_id']));
     }
 } else {
-    $garage = $db->get_garage($garage_id);
-    if ($garage == null) {
-        $_SESSION['error'] = 'Garage not found';
-        redirect_to(url_for('/garage/index.php'));
-    }
+
 }
 
 $locations = $db->get_all_locations();
@@ -49,7 +48,7 @@ include(SHARED_PATH . '/public_header.php');
                href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>">Back</a>
         </div>
 
-        <form action="<?php echo url_for('/garage/edit.php?id=' . h(u($garage_id))); ?>" method="post">
+        <form action="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>" method="post">
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" class="form-control" placeholder="Garage name" aria-label="Garage name" name="name"

@@ -71,6 +71,7 @@ function h(?string $string = ""): string
  */
 #[NoReturn] function redirect_to(string $location): void
 {
+    if (isset($db)) $db->disconnect();
     header('Location: ' . $location);
     exit;
 }

@@ -3,31 +3,27 @@ global $db;
 require_once('../../private/initialize.php');
 require_login();
 
-if (!isset($_GET['id'])) {
-    redirect_to(url_for('/garage/index.php'));
-}
-$garage_id = $_GET['id'];
+$id = $_GET['id'] ?? '0';
 
-$garage = $db->get_garage($garage_id);
+$garage = $db->get_garage($id);
 if ($garage == null) {
     $_SESSION['error'] = 'Garage not found';
     redirect_to(url_for('/garage/index.php'));
 }
 
-if (!is_owner($garage_id)) {
+if (!is_owner($id)) {
+    //TODO Check for last owner?
     $_SESSION['error'] = 'You do not have authority to delete that garage';
     redirect_to(url_for('/garage/show.php?id=' . h(u($garage['garage_id']))));
 }
 
 if (is_post_request()) {
-    //TODO Check for last owner
     $item_count = count($db->get_all_items(['garage_id' => $garage['garage_id']]));
     if ($item_count != 0) {
         $_SESSION['error'] = 'Garage must be empty to delete';
     } else {
         $db->delete_garage($garage);
         $_SESSION['message'] = 'Garage deleted successfully';
-        $db->disconnect();
         redirect_to(url_for('/garage/index.php'));
     }
 }

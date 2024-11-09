@@ -46,7 +46,6 @@ if (!empty($_GET['code'])) {
                 //Get user from DB and log in
                 log_in();
                 $_SESSION['message'] = "Welcome back " . $_SESSION['name'];
-                //TODO Close $db?
                 redirect_to(url_for('auth/profile.php'));
             } else {
                 echo 'Account not found, would you like to make a new one?';
