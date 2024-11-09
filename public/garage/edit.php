@@ -8,7 +8,7 @@ if (!isset($_GET['id'])) {
 }
 $garage_id = $_GET['id'];
 
-if (!is_owner($_SESSION['user_id'], $garage_id)) {
+if (!is_owner($garage_id)) {
     $_SESSION['error'] = 'You do not have authority to edit that garage';
     redirect_to(url_for('/garage/index.php'));
 }

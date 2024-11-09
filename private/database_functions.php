@@ -107,7 +107,7 @@ class Database
     #endregion
 
     #region user
-    /** Get first 10 user used for debugging at this time
+    /** Get first 10 users, used for debugging at this time
      * @return array
      */
     public function get_all_users(): array
@@ -164,14 +164,14 @@ class Database
         $email = $this->escape($email);
 
         $query = <<<SQL
-        SELECT user_id,
-               username,
-               name,
-               email,
-               location_id,
-               location.description as location,
-               user.created_at,
-               user.updated_at
+        SELECT  user_id,
+                username,
+                name,
+                email,
+                location_id,
+                location.description as location,
+                user.created_at,
+                user.updated_at
         FROM user
         LEFT JOIN location using (location_id)
         WHERE email='$email'
@@ -231,16 +231,16 @@ class Database
         $visible_query = isset($options['visible']) ? "WHERE visible = '" . $this->escape($options['visible']) . "'" : "";
 
         $query = <<<SQL
-            SELECT  garage_id,
-                    name,
-                    garage.description,
-                    location.description as location,
-                    visible,
-                    garage.updated_at,
-                    garage.created_at
-            FROM garage
-            LEFT JOIN location using (location_id)
-            {$visible_query}
+        SELECT  garage_id,
+                name,
+                garage.description,
+                location.description as location,
+                visible,
+                garage.updated_at,
+                garage.created_at
+        FROM garage
+        LEFT JOIN location using (location_id)
+        {$visible_query}
         SQL;
 
         return $this->get_query($query);
@@ -255,18 +255,18 @@ class Database
         $garage_id = $this->escape($garage_id);
 
         $query = <<<SQL
-            SELECT  garage_id,
-                    name,
-                    garage.description,
-                    location.description as location,
-                    location.location_id,
-                    visible,
-                    garage.updated_at,
-                    garage.created_at
-            FROM garage
-            LEFT JOIN location using (location_id)
-            WHERE garage_id='$garage_id'
-            LIMIT 1
+        SELECT  garage_id,
+                name,
+                garage.description,
+                location.description as location,
+                location.location_id,
+                visible,
+                garage.updated_at,
+                garage.created_at
+        FROM garage
+        LEFT JOIN location using (location_id)
+        WHERE garage_id='$garage_id'
+        LIMIT 1
         SQL;
 
         $result = $this->get_query($query);
@@ -346,13 +346,12 @@ class Database
         $visible = $this->escape($garage['visible']);
 
         $query = <<<SQL
-            UPDATE garage SET
-                name = '$name',
-                description = '$description',
-                location_id = '$location_id',
-                visible = '$visible'
-            WHERE garage_id = '$garage_id'
-            LIMIT 1
+        UPDATE garage SET   name = '$name',
+                            description = '$description',
+                            location_id = '$location_id',
+                            visible = '$visible'
+        WHERE garage_id = '$garage_id'
+        LIMIT 1
         SQL;
 
         $this->update_query($query);
@@ -367,11 +366,11 @@ class Database
         $garage_id = $this->escape($garage['garage_id']);
 
         $query = <<<SQL
-            DELETE FROM garage
-            WHERE garage_id = '$garage_id'
-            LIMIT 1;
+        DELETE FROM garage
+        WHERE garage_id = '$garage_id'
+        LIMIT 1;
         SQL;
-        dump($query);
+
         $this->delete_query($query);
     }
 
@@ -402,6 +401,31 @@ class Database
         return $this->get_query($query);
     }
 
+    public function get_item(string $item_id, array $options = []):array{
+
+        $item_id = $this->escape($item_id);
+
+        $query = <<<SQL
+        SELECT  item_id,
+                garage_id,
+                name,
+                description,
+                visible
+        FROM item
+        WHERE item_id = '$item_id'
+        LIMIT 1
+        SQL;
+
+        $result = $this->get_query($query);
+        if ($result) {
+            return $result[0];
+        } else {
+            return [];
+        }
+
+        return $this->get_query($query);
+    }
+
 #endregion
 
 #region location
@@ -416,7 +440,7 @@ class Database
                 description
         FROM location
         ORDER BY description
-    SQL;
+        SQL;
 
         return $this->get_query($query);
     }
@@ -460,14 +484,14 @@ class Database
         $garage_id = $this->escape($garage_id);
 
         $query = <<<SQL
-            SELECT IFNULL((
-                SELECT description
-                FROM user_garage_access
-                LEFT JOIN access using (access_id)
-                WHERE user_id='$user_id'
-                AND garage_id='$garage_id'
-                LIMIT 1),
-            "User") access;
+        SELECT IFNULL((
+            SELECT description
+            FROM user_garage_access
+            LEFT JOIN access using (access_id)
+            WHERE user_id='$user_id'
+            AND garage_id='$garage_id'
+            LIMIT 1),
+        "User") access;
         SQL;
 
         return $this->get_query($query)[0]['access'];

@@ -16,6 +16,7 @@ include(SHARED_PATH . '/public_header.php');
         <?php if (is_logged_in()) { ?>
             <h1><?php echo $page_title; ?></h1>
             <div class="cta">
+                <a class="btn btn-primary action" href="javascript:history.back()">Back</a>
                 <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>">Create new
                     Garage</a>
             </div>
@@ -28,7 +29,7 @@ include(SHARED_PATH . '/public_header.php');
                         <th>Name</th>
                         <th>Description</th>
                         <th>Location</th>
-                        <th>Visible</th>
+                        <th>Visible to public?</th>
                     </tr>
                     <?php foreach (array_filter($my_garages, function ($g) {
                         return $g['access'] == "Owner";
@@ -52,7 +53,7 @@ include(SHARED_PATH . '/public_header.php');
                         <th>Name</th>
                         <th>Description</th>
                         <th>Location</th>
-                        <th>Visible</th>
+                        <th>Visible to public?</th>
                     </tr>
                     <?php foreach (array_filter($my_garages, function ($g) {
                         return $g['access'] == "Worker";

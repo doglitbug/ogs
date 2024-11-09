@@ -1,23 +1,12 @@
 <?php
-/** Wrapper for get_access_level from database
- * so we don't need to global $db on every level function
- * This is not stored as a $_SESSION variable so that access changes are instant
- * @param $user_id
- * @return string Access level Super Admin|Admin|User
- */
-function get_access_level($user_id): string
-{
-    global $db;
-    return $db->get_access_level($user_id);
-}
-
 /** Is this user a Super Admin?
  * @param $user_id
  * @return bool
  */
 function is_super_admin($user_id): bool
 {
-    return get_access_level($user_id) == "Super Admin";
+    global $db;
+    return $db->get_access_level($user_id) == "Super Admin";
 }
 
 /** Is this user an Admin?
@@ -26,7 +15,8 @@ function is_super_admin($user_id): bool
  */
 function is_admin($user_id): bool
 {
-    return get_access_level($user_id) == "Admin";
+    global $db;
+    return $db->get_access_level($user_id) == "Admin";
 }
 
 /** Is this user a standard User?
@@ -35,7 +25,8 @@ function is_admin($user_id): bool
  */
 function is_user($user_id): bool
 {
-    return get_access_level($user_id) == "User";
+    global $db;
+    return $db->get_access_level($user_id) == "User";
 }
 
 /** This area requires a Super Admin
@@ -45,7 +36,7 @@ function require_super_admin(): void
 {
     require_login();
     if (!is_super_admin($_SESSION['user_id'])) {
-        $_SESSION['message'] = "That area requires a super admin to access";
+        $_SESSION['error'] = "That area requires a super admin to access";
         //TODO Why here?
         redirect_to(url_for('auth/login.php'));
     }
@@ -58,7 +49,7 @@ function require_admin(): void
 {
     require_login();
     if (!is_super_admin($_SESSION['user_id']) && !is_admin($_SESSION['user_id'])) {
-        $_SESSION['message'] = "That area requires an admin or higher to access";
+        $_SESSION['error'] = "That area requires an admin or higher to access";
         //TODO Why here?
         redirect_to(url_for('auth/login.php'));
     }
@@ -79,25 +70,48 @@ function require_login(): void
 
 #region ownership
 /** Is this user an owner of the garage?
- * @param string $user_id
  * @param string $garage_id
  * @return bool
  */
-function is_owner(string $user_id, string $garage_id): bool
+function is_owner(string $garage_id): bool
 {
     global $db;
-    return strcmp($db->get_user_access($user_id, $garage_id), "Owner") == 0;
+    if (!is_logged_in()) return false;
+
+    return strcmp($db->get_user_access($_SESSION['user_id'], $garage_id), "Owner") == 0;
 }
 
-/** IS this user a worker of the garage?
- * @param string $user_id
+/** Is this user a worker of the garage?
  * @param string $garage_id
  * @return bool
  */
-function is_worker(string $user_id, string $garage_id): bool
+function is_worker(string $garage_id): bool
 {
     global $db;
-    return strcmp($db->get_user_access($user_id, $garage_id), "Worker") == 0;
+    if (!is_logged_in()) return false;
+
+    return strcmp($db->get_user_access($_SESSION['user_id'], $garage_id), "Worker") == 0;
+}
+
+/** Is the current user an owner or worker of the garage?
+ * @param array $garage
+ * @return bool
+ */
+function can_edit_items(array $garage): bool {
+    if (!is_logged_in()) return false;
+
+    return (is_owner($garage['garage_id']) || is_worker($garage['garage_id']));
+}
+
+/** Is the current user an owner or worker of the item?
+ * If no user logged in, return false
+ * @param array $item
+ * @return bool
+ */
+function can_edit_item(array $item): bool {
+    if (!is_logged_in()) return false;
+
+    return (is_owner($item['garage_id']) || is_worker($item['garage_id']));
 }
 
 #endregion

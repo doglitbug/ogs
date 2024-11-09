@@ -14,7 +14,7 @@ if ($garage == null) {
     redirect_to(url_for('/garage/index.php'));
 }
 
-if (!is_owner($_SESSION['user_id'], $garage_id)) {
+if (!is_owner($garage_id)) {
     $_SESSION['error'] = 'You do not have authority to delete that garage';
     redirect_to(url_for('/garage/show.php?id=' . h(u($garage['garage_id']))));
 }
