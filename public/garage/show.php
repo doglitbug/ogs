@@ -40,13 +40,17 @@ include(SHARED_PATH . '/public_header.php');
                     <th>Name</th>
                     <th>Description</th>
                     <th>Location</th>
-                    <th>Visible to public?</th>
+                    <?php if (is_owner_or_worker($garage)) { ?>
+                        <th>Visible to public?</th>
+                    <?php } ?>
                 </tr>
                 <tr>
                     <td><?php echo h($garage['name']); ?></td>
                     <td><?php echo h($garage['description']); ?></td>
                     <td><?php echo h($garage['location']); ?></td>
-                    <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
+                    <?php if (is_owner_or_worker($garage)) { ?>
+                        <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
+                    <?php } ?>
                 </tr>
             </table>
         </div>
@@ -66,7 +70,9 @@ include(SHARED_PATH . '/public_header.php');
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
-                    <th>Visible</th>
+                    <?php if (is_owner_or_worker($garage)) { ?>
+                        <th>Visible</th>
+                    <?php } ?>
                 </tr>
                 <?php foreach ($items as $item) {
                     if ($item['visible'] == '0' && !can_edit_item($item)) break;
@@ -76,7 +82,9 @@ include(SHARED_PATH . '/public_header.php');
                             <a href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><?php echo h($item['name']); ?></a>
                         </td>
                         <td><?php echo h($item['description']); ?></td>
-                        <td><?php echo $item['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
+                        <?php if (is_owner_or_worker($garage)) { ?>
+                            <td><?php echo $item['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
+                        <?php } ?>
                     </tr>
                 <?php } ?>
             </table>
