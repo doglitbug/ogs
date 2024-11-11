@@ -52,3 +52,7 @@ div.row {
 div.form-check {
     padding-top: 15px;
 }
+
+div.images img {
+    padding: 5px;
+}

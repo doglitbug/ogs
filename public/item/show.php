@@ -4,12 +4,14 @@ require_once('../../private/initialize.php');
 
 $id = $_GET['id'] ?? '1';
 
-$item = $db->get_item($id);
+$item = $db->get_item($id, ["public" => true]);
 if ($item == null || ($item['visible'] == '0' && !can_edit_item($item))) {
     //TODO Check if garage is hidden
     $_SESSION['error'] = 'Item not found';
     redirect_to(url_for('/item/index.php'));
 }
+
+$images = $db->get_item_images($item['item_id']);
 
 $page_title = 'Show Item';
 include(SHARED_PATH . '/public_header.php');
@@ -54,6 +56,12 @@ include(SHARED_PATH . '/public_header.php');
                 </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="images">
+            <?php foreach ($images as $image) {
+                echo '<img src="' . url_for('images/' . $image['source']) . '" width="' . $image['width'] . '" height="' . $image['height'] . '">';
+            } ?>
         </div>
     </div>
 

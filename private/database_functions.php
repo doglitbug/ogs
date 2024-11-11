@@ -405,20 +405,23 @@ class Database
 
     /** Get an individual item, usually for show/edit item
      * @param string $item_id
-     * @param array $options
+     * @param array $options public: garage hidden will override visibility
      * @return array
      */
     public function get_item(string $item_id, array $options = []): array
     {
         $item_id = $this->escape($item_id);
 
+        $visible_query = isset($options['public']) ? "IF(item.visible AND garage.visible, true, false) as visible" : "item.visible";
+
         $query = <<<SQL
-        SELECT  item_id,
-                garage_id,
-                name,
-                description,
-                visible
+        SELECT  item.item_id,
+                item.garage_id,
+                item.name,
+                item.description,
+                $visible_query
         FROM item
+        LEFT JOIN garage USING (garage_id)
         WHERE item_id = '$item_id'
         LIMIT 1
         SQL;
@@ -477,11 +480,12 @@ class Database
     }
 
     /** Delete an item
-     * @todo Remove all images as well?
      * @param array $item
      * @return void
+     * @todo Remove all images as well?
      */
-    public function delete_item(array $item): void{
+    public function delete_item(array $item): void
+    {
         $item_id = $this->escape($item['item_id']);
 
         $query = <<<SQL
@@ -563,6 +567,33 @@ class Database
         SQL;
 
         return $this->get_query($query)[0]['access'];
+    }
+#endregion
+#region images
+    /** Get the images for an item
+     * @param string $item_id
+     * @param array $options
+     * @return array
+     */
+    public function get_item_images(string $item_id, array $options = []): array
+    {
+        $item_id = $this->escape($item_id);
+
+        $query = <<<SQL
+        SELECT  item_id,
+                image_id,
+                main,
+                width,
+                height,
+                source
+        FROM item_image
+        JOIN image using (image_id) 
+        WHERE item_id = '$item_id'
+        ORDER BY main DESC
+        SQL;
+        //TODO Then order by date created/updated?
+
+        return $this->get_query($query);
     }
 #endregion
 }
