@@ -585,7 +585,7 @@ class Database
                 main,
                 width,
                 height,
-                source
+                CONCAT(path, '/', filename) as source
         FROM item_image
         JOIN image using (image_id) 
         WHERE item_id = '$item_id'
@@ -595,5 +595,24 @@ class Database
 
         return $this->get_query($query);
     }
+
+    /** Remove image from database, assumes that the file has already been removed
+     * This should also remove item/garage_item links
+     * @param array $image
+     * @return void
+     */
+    public function delete_image(array $image): void
+    {
+        $image_id = $this->escape($image['image_id']);
+
+        $query = <<<SQL
+        DELETE FROM image
+        WHERE image_id = '$image_id'
+        LIMIT 1;
+        SQL;
+
+        $this->delete_query($query);
+    }
+
 #endregion
 }

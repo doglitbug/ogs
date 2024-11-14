@@ -31,6 +31,8 @@ if (is_post_request()) {
     }
 }
 
+$images = $db->get_item_images($item['item_id']);
+
 $page_title = 'Edit Item';
 include(SHARED_PATH . '/public_header.php');
 ?>
@@ -73,6 +75,13 @@ include(SHARED_PATH . '/public_header.php');
                             Visible to public?
                         </label>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="images">
+                    <?php foreach ($images as $image) {
+                        echo '<img src="' . url_for('images/' . $image['source']) . '" width="' . $image['width'] . '" height="' . $image['height'] . '">';
+                    } ?>
                 </div>
             </div>
             <div class="row">

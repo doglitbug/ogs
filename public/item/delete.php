@@ -7,6 +7,7 @@ require_login();
 $id = $_GET['id'] ?? '0';
 
 $item = $db->get_item($id);
+
 if ($item == null) {
     $_SESSION['error'] = 'Item not found';
     redirect_to(url_for('/item/index.php'));
@@ -17,11 +18,20 @@ if (!can_edit_item($item)) {
     redirect_to(url_for('/item/show.php?id=' . h(u($item['item_id']))));
 }
 
+$images = $db->get_item_images($item['item_id']);
+
 if (is_post_request()) {
+    //Must delete item_image links first
+    foreach ($images as $image) {
+        unlink(PUBLIC_PATH . '/images/' . $image['source']);
+        $db->delete_image($image);
+    }
+
     $db->delete_item($item);
     $_SESSION['message'] = 'Item deleted successfully';
     redirect_to(url_for('/garage/show.php?id=' . h(u($item['garage_id']))));
 }
+
 
 $page_title = 'Delete Item';
 include(SHARED_PATH . '/public_header.php');

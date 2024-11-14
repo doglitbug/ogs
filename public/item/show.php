@@ -60,7 +60,9 @@ include(SHARED_PATH . '/public_header.php');
 
         <div class="images">
             <?php foreach ($images as $image) {
+                echo '<a href="'.url_for('images/show?id='.h(u($image['image_id']))).'">';
                 echo '<img src="' . url_for('images/' . $image['source']) . '" width="' . $image['width'] . '" height="' . $image['height'] . '">';
+                echo '</a>';
             } ?>
         </div>
     </div>
