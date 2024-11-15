@@ -146,7 +146,7 @@ function validate_garage(array $garage): array
     return $errors;
 }
 
-function validate_item(array $item): array
+function validate_item(array $item, $files): array
 {
     global $db;
     $errors = [];
@@ -172,6 +172,56 @@ function validate_item(array $item): array
     }
 
     return $errors;
+}
+
+/** Check to see if uploaded image is okay
+ * TODO only one image at a time so far
+ * @param array $images
+ * @return string|null error messages
+ */
+function validate_images(array $images): string|null
+{
+    $phpFileUploadErrors = array(
+        0 => 'There is no error, the file uploaded with success',
+        1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+        2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+        3 => 'The uploaded file was only partially uploaded',
+        4 => 'No file was uploaded',
+        6 => 'Missing a temporary folder',
+        7 => 'Failed to write file to disk.',
+        8 => 'A PHP extension stopped the file upload.',
+    );
+
+    $acceptable_types = array(
+        "image/gif", "image/png", "image/jpeg"
+    );
+
+    if (empty($images)) return null;
+
+    $file_info = new finfo(FILEINFO_MIME_TYPE);
+
+    foreach ($images as $image) {
+        switch ($image['error']) {
+            case UPLOAD_ERR_OK:
+                //Check size
+                if ($image['size'] > 1048576 * 2) {
+                    return "Image must be less than 2 MB in size";
+                }
+                //Check file type on actual file
+                $image['type'] = $file_info->file($image['tmp_name']);
+                if (!in_array($image['type'], $acceptable_types)) {
+                    return "Unsupported image type: only gif, png and jpeg supported";
+                }
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                break;
+            default:
+                //TODO Log this error for webmaster
+                return $phpFileUploadErrors($image['error']);
+        }
+    }
+
+    return null;
 }
 
 #endregion

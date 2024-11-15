@@ -22,7 +22,7 @@ if (is_post_request()) {
     $item['description'] = $_POST['description'] ?? '';
     $item['visible'] = $_POST['visible'] ?? '';
 
-    $errors = validate_item($item);
+    $errors = validate_item($item, $_FILES);
 
     if (empty($errors)) {
         $db->update_item($item);

@@ -23,13 +23,34 @@ if (is_post_request()) {
     $item['description'] = $_POST['description'] ?? '';
     $item['visible'] = $_POST['visible'] ?? '';
 
-    $errors = validate_item($item);
-
+    $errors = validate_item($item, $_FILES);
     if (empty($errors)) {
-        dump($item);
-        $new_id = $db->insert_item($item);
+        //TODO This will create the item without images if they fail, validation should take care of this
+        $item_id = $db->insert_item($item);
+        //Move and link images
+        foreach ($_FILES as $image) {
+            //Get dimensions of image for database
+            //Assume validation means they actually exist
+            list($width, $height) = getimagesize($image['tmp_name']);
+            $image['width'] = $width;
+            $image['height'] = $height;
+            $image['path'] = "item";
+
+            //Clean name and make unique
+            $path_info = pathinfo($image['name']);
+            $base = $path_info['filename'];
+            $base = preg_replace("/[^\w-]/", "_", $base);
+            $image['filename'] = time() . $base . "." . $path_info['extension'];
+
+            //TODO Check for success!
+            move_uploaded_file($image['tmp_name'], PUBLIC_PATH . '/images/' . $image['path'] . '/' . $image['filename']);
+            $image_id = $db->insert_image($image);
+            //Create item_image link
+            $db->insert_item_image($item_id, $image_id);
+        }
+
         $_SESSION['message'] = 'Item created successfully';
-        redirect_to(url_for('/item/show.php?id=' . $new_id));
+        redirect_to(url_for('/item/show.php?id=' . $item_id));
     }
 } else {
     $item['name'] = '';
@@ -49,7 +70,8 @@ include(SHARED_PATH . '/public_header.php');
                href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>">Back</a>
         </div>
 
-        <form action="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>" method="post">
+        <form action="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>" method="post"
+              enctype="multipart/form-data">
             <div class="row">
                 <div class="col-xl-6">
                     <label for="name" class="form-label">Name</label>
@@ -70,6 +92,13 @@ include(SHARED_PATH . '/public_header.php');
                 </div>
             </div>
             <div class="row">
+                <div class="col-xl-6">
+                    <label for="images" class="form-label">Images</label>
+                    <input type="file" id="images" name="images">
+                    <?php if (isset($errors['images'])) {
+                        echo '<div class="text-danger">' . $errors['images'] . '</div>';
+                    } ?>
+                </div>
                 <div class="col-xl-6">
                     <div class="form-check form-switch">
                         <input type="hidden" name="visible" value="0"/>

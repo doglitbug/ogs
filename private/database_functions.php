@@ -569,7 +569,7 @@ class Database
         return $this->get_query($query)[0]['access'];
     }
 #endregion
-#region images
+#region image
     /** Get the images for an item
      * @param string $item_id
      * @param array $options
@@ -594,6 +594,55 @@ class Database
         //TODO Then order by date created/updated?
 
         return $this->get_query($query);
+    }
+
+    /** Insert a new image into the database, assumes it has been moved to the correct location
+     * @param array $image
+     * @return int image_id
+     */
+    public function insert_image(array $image): int {
+        $width = $this->escape($image['width']);
+        $height = $this->escape($image['height']);
+        $path = $this->escape($image['path']);
+        $filename= $this->escape($image['filename']);
+
+
+        $query = <<<SQL
+            INSERT INTO image
+            (width, height, path, filename)
+            VALUES ('$width',
+                    '$height',
+                    '$path',
+                    '$filename'
+                    )
+        SQL;
+
+        return $this->insert_query($query);
+    }
+
+    /** Link an image to an item
+     * @param string $item_id
+     * @param string $image_id
+     * @return void
+     * @todo main value
+     */
+    public function insert_item_image(string $item_id, string $image_id, string $main="0"): void
+    {
+        $item_id = $this->escape($item_id);
+        $image_id = $this->escape($image_id);
+
+        $query = <<<SQL
+            INSERT IGNORE INTO item_image
+            (item_id, image_id, main)
+            VALUES ('$item_id',
+                    '$image_id',
+                    '$main'
+                    )
+        SQL;
+
+        dump($query);
+
+        $this->insert_query($query);
     }
 
     /** Remove image from database, assumes that the file has already been removed
