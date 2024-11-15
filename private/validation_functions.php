@@ -165,6 +165,11 @@ function validate_item(array $item, $files): array
         $errors['description'] = "Description must be between 2 and 255 characters";
     }
 
+    #images
+    if ($images_errors = validate_images($files)) {
+        $errors['images'] = $images_errors;
+    }
+
     #visible
     $visible_str = (string)$item['visible'];
     if (!has_inclusion_of($visible_str, ["0", "1"])) {
@@ -215,9 +220,11 @@ function validate_images(array $images): string|null
                 break;
             case UPLOAD_ERR_NO_FILE:
                 break;
+            case UPLOAD_ERR_INI_SIZE:
+                return "Image must be less than 2 MB in size";
             default:
                 //TODO Log this error for webmaster
-                return $phpFileUploadErrors($image['error']);
+                return $phpFileUploadErrors[$image['error']];
         }
     }
 
