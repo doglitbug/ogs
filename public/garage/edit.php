@@ -36,7 +36,7 @@ if (is_post_request()) {
 
 $locations = $db->get_all_locations();
 
-$page_title = 'Edit Garage';
+$page_title = 'Edit Garage: ' . h($garage['name']);
 include(SHARED_PATH . '/public_header.php');
 ?>
 

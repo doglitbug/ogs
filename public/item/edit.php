@@ -80,7 +80,11 @@ include(SHARED_PATH . '/public_header.php');
             <div class="row">
                 <div class="images">
                     <?php foreach ($images as $image) {
-                        echo '<img src="' . url_for('images/' . $image['source']) . '" width="' . $image['width'] . '" height="' . $image['height'] . '">';
+                        list($width, $height) = rescale_image($image);
+
+                        echo '<a href="' . url_for('image/show.php?id=' . h(u($image['image_id']))) . '">';
+                        echo '<img src="' . url_for('images/' . $image['source']) . '" width="' . $width . '" height="' . $height . '">';
+                        echo '</a>';
                     } ?>
                 </div>
             </div>

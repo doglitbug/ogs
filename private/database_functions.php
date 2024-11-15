@@ -432,8 +432,6 @@ class Database
         } else {
             return [];
         }
-
-        return $this->get_query($query);
     }
 
     /** Insert a new item
@@ -479,10 +477,9 @@ class Database
         $this->update_query($query);
     }
 
-    /** Delete an item
+    /** Delete an item, assumes item_image links have been removed
      * @param array $item
      * @return void
-     * @todo Remove all images as well?
      */
     public function delete_item(array $item): void
     {
@@ -570,12 +567,36 @@ class Database
     }
 #endregion
 #region image
-    /** Get the images for an item
-     * @param string $item_id
-     * @param array $options
+    /** Get a single image from the database
+     * @param string $image_id
      * @return array
      */
-    public function get_item_images(string $item_id, array $options = []): array
+    public function get_image(string $image_id): array
+    {
+        $image_id = $this->escape($image_id);
+
+        $query = <<<SQL
+        SELECT  image_id,
+                width,
+                height,
+                CONCAT(path, '/', filename) as source
+        FROM image
+        WHERE image_id = '$image_id'
+        SQL;
+
+        $result = $this->get_query($query);
+        if ($result) {
+            return $result[0];
+        } else {
+            return [];
+        }
+    }
+
+    /** Get the images for an item
+     * @param string $item_id
+     * @return array
+     */
+    public function get_item_images(string $item_id): array
     {
         $item_id = $this->escape($item_id);
 
@@ -591,7 +612,6 @@ class Database
         WHERE item_id = '$item_id'
         ORDER BY main DESC
         SQL;
-        //TODO Then order by date created/updated?
 
         return $this->get_query($query);
     }
@@ -600,12 +620,12 @@ class Database
      * @param array $image
      * @return int image_id
      */
-    public function insert_image(array $image): int {
+    public function insert_image(array $image): int
+    {
         $width = $this->escape($image['width']);
         $height = $this->escape($image['height']);
         $path = $this->escape($image['path']);
-        $filename= $this->escape($image['filename']);
-
+        $filename = $this->escape($image['filename']);
 
         $query = <<<SQL
             INSERT INTO image
@@ -620,13 +640,35 @@ class Database
         return $this->insert_query($query);
     }
 
+    /** Link an image to a garage
+     * @param string $garage_id
+     * @param string $image_id
+     * @param string $main is this the main image?
+     * @return void
+     */
+    public function insert_garage_image(string $garage_id, string $image_id, string $main = "0"): void
+    {
+        $garage_id = $this->escape($garage_id);
+        $image_id = $this->escape($image_id);
+
+        $query = <<<SQL
+            INSERT IGNORE INTO garage_image
+            (garage_id, image_id, main)
+            VALUES ('$garage_id',
+                    '$image_id',
+                    '$main'
+                    )
+        SQL;
+
+        $this->insert_query($query);
+    }
     /** Link an image to an item
      * @param string $item_id
      * @param string $image_id
+     * @param string $main is this the main image?
      * @return void
-     * @todo main value
      */
-    public function insert_item_image(string $item_id, string $image_id, string $main="0"): void
+    public function insert_item_image(string $item_id, string $image_id, string $main = "0"): void
     {
         $item_id = $this->escape($item_id);
         $image_id = $this->escape($image_id);
@@ -639,8 +681,6 @@ class Database
                     '$main'
                     )
         SQL;
-
-        dump($query);
 
         $this->insert_query($query);
     }

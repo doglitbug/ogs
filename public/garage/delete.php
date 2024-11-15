@@ -28,7 +28,7 @@ if (is_post_request()) {
     }
 }
 
-$page_title = 'Delete Garage';
+$page_title = 'Delete Garage: ' . h($garage['name']);
 include(SHARED_PATH . '/public_header.php');
 ?>
 
@@ -41,7 +41,6 @@ include(SHARED_PATH . '/public_header.php');
         </div>
 
         <p>Are you sure you wish to delete this garage?</p>
-        <p class="item"><?php echo h($garage['name']); ?></p>
         <form action="<?php echo url_for('/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>" method="post">
             <div id="operations">
                 <button type="submit" class="btn btn-danger">Delete Garage</button>

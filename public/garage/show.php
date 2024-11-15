@@ -11,7 +11,7 @@ if ($garage == null || ($garage['visible'] == '0' && !is_owner_or_worker($garage
 }
 $items = $db->get_all_items(['garage_id' => $garage['garage_id']]);
 
-$page_title = 'Show Garage';
+$page_title = 'Show Garage: ' . h($garage['name']);
 include(SHARED_PATH . '/public_header.php');
 ?>
 
@@ -65,7 +65,7 @@ include(SHARED_PATH . '/public_header.php');
             <div class="cta">
                 <a class="btn btn-success action"
                    href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>">Add
-                    Items</a>
+                    Item</a>
             </div>
         <?php } ?>
 
@@ -76,7 +76,7 @@ include(SHARED_PATH . '/public_header.php');
                     <th>Name</th>
                     <th>Description</th>
                     <?php if (is_owner_or_worker($garage)) { ?>
-                        <th>Visible</th>
+                        <th>Visible to public?</th>
                     <?php } ?>
                 </tr>
                 </thead>

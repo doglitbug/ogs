@@ -120,3 +120,18 @@ function dump(mixed $variable): void
     print_r($variable);
     echo '</pre>';
 }
+
+/** Provides new width and height for an image, scaled to the provided size
+ * @param array $image
+ * @param int $max_size maximum size for width/height
+ * @return array new width, new height
+ */
+function rescale_image(array $image, int $max_size = 256): array
+{
+    $width = $image['width'];
+    $height = $image['height'];
+    $max = max($width, $height);
+    $scale = $max_size / $max;
+
+    return [floor($width * $scale), floor($height * $scale)];
+}
