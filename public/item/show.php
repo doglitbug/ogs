@@ -58,6 +58,7 @@ include(SHARED_PATH . '/public_header.php');
             </table>
         </div>
 
+        <h3>Images:</h3>
         <div class="images">
             <?php foreach ($images as $image) {
                 list($width, $height) = rescale_image($image);

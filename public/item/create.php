@@ -92,14 +92,7 @@ include(SHARED_PATH . '/public_header.php');
                 </div>
             </div>
             <div class="row">
-                <div class="col-xl-6">
-                    <label for="images" class="form-label">Images</label>
-                    <input type="file" id="images" name="images">
-                    <?php if (isset($errors['images'])) {
-                        echo '<div class="text-danger">' . $errors['images'] . '</div>';
-                    } ?>
-                </div>
-                <div class="col-xl-6">
+                <div class="col-xl-12">
                     <div class="form-check form-switch">
                         <input type="hidden" name="visible" value="0"/>
                         <input class="form-check-input" type="checkbox" name="visible" value="1"
@@ -108,6 +101,16 @@ include(SHARED_PATH . '/public_header.php');
                             Visible to public?
                         </label>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <h3>Images</h3>
+                <div class="col-xl-6">
+                    <label for="images" class="form-label">Add image</label>
+                    <input type="file" id="images" name="images">
+                    <?php if (isset($errors['images'])) {
+                        echo '<div class="text-danger">' . $errors['images'] . '</div>';
+                    } ?>
                 </div>
             </div>
             <div class="row">

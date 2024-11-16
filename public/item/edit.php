@@ -26,6 +26,31 @@ if (is_post_request()) {
 
     if (empty($errors)) {
         $db->update_item($item);
+
+        //Move and link images
+        foreach ($_FILES as $image) {
+            //Check that this file is valid!
+            if ($image['error'] != 0) continue;
+            //Get dimensions of image for database
+            //Assume validation means they actually exist
+            list($width, $height) = getimagesize($image['tmp_name']);
+            $image['width'] = $width;
+            $image['height'] = $height;
+            $image['path'] = "item";
+
+            //Clean name and make unique
+            $path_info = pathinfo($image['name']);
+            $base = $path_info['filename'];
+            $base = preg_replace("/[^\w-]/", "_", $base);
+            $image['filename'] = time() . $base . "." . $path_info['extension'];
+
+            //TODO Check for success!
+            move_uploaded_file($image['tmp_name'], PUBLIC_PATH . '/images/' . $image['path'] . '/' . $image['filename']);
+            $image_id = $db->insert_image($image);
+            //Create item_image link
+            $db->insert_item_image($item['item_id'], $image_id);
+        }
+
         $_SESSION['message'] = 'Item updated successfully';
         redirect_to(url_for('/item/show.php?id=' . h(u($item['item_id']))));
     }
@@ -45,7 +70,8 @@ include(SHARED_PATH . '/public_header.php');
                href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>">Back</a>
         </div>
 
-        <form action="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>" method="post">
+        <form action="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>" method="post"
+              enctype="multipart/form-data">
             <div class="row">
                 <div class="col-xl-6">
                     <label for="name" class="form-label">Name</label>
@@ -66,7 +92,7 @@ include(SHARED_PATH . '/public_header.php');
                 </div>
             </div>
             <div class="row">
-                <div class="col-xl-6">
+                <div class="col-xl-12">
                     <div class="form-check form-switch">
                         <input type="hidden" name="visible" value="0"/>
                         <input class="form-check-input" type="checkbox" name="visible" value="1"
@@ -78,6 +104,7 @@ include(SHARED_PATH . '/public_header.php');
                 </div>
             </div>
             <div class="row">
+                <h3>Images:</h3>
                 <div class="images">
                     <?php foreach ($images as $image) {
                         list($width, $height) = rescale_image($image);
@@ -85,6 +112,15 @@ include(SHARED_PATH . '/public_header.php');
                         echo '<a href="' . url_for('image/show.php?id=' . h(u($image['image_id']))) . '">';
                         echo '<img src="' . url_for('images/' . $image['source']) . '" width="' . $width . '" height="' . $height . '">';
                         echo '</a>';
+                    } ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-6">
+                    <label for="images" class="form-label">Add image</label>
+                    <input type="file" id="images" name="images">
+                    <?php if (isset($errors['images'])) {
+                        echo '<div class="text-danger">' . $errors['images'] . '</div>';
                     } ?>
                 </div>
             </div>
