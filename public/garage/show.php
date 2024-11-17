@@ -73,6 +73,7 @@ include(SHARED_PATH . '/public_header.php');
             <table class="table table-hover">
                 <thead>
                 <tr>
+                    <th>Preview</th>
                     <th>Name</th>
                     <th>Description</th>
                     <?php if (is_owner_or_worker($garage)) { ?>
@@ -85,6 +86,18 @@ include(SHARED_PATH . '/public_header.php');
                     if ($item['visible'] == '0' && !can_edit_item($item)) continue;
                     ?>
                     <tr>
+                        <td><?php
+                            if ($item['image_id'] != 0) {
+                                list($width, $height) = rescale_image($item, 96);
+
+                                echo '<a href="' . url_for('image/show.php?id=' . h(u($item['image_id']))) . '">';
+                                echo '<img src="' . url_for('images/' . h($item['source'])) . '" width="' . $width . '" height="' . $height . '">';
+                                echo '</a>';
+                            } else {
+                                echo "&nbsp;";
+                            }
+                            ?>
+                        </td>
                         <td>
                             <a href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><?php echo h($item['name']); ?></a>
                         </td>

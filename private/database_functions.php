@@ -196,7 +196,7 @@ class Database
         return $this->get_user_by_email($email) !== [];
     }
 
-    /** Check to see if t5his user is Super Admin, Admin or ordinary User
+    /** Check to see if this user is Super Admin, Admin or ordinary User
      * @param string $user_id
      * @return string
      */
@@ -379,7 +379,7 @@ class Database
 #endregion
 
 #region item
-    /** Get items, usually from an individual garage
+    /** Get items, usually from an individual garage with primary image
      * @param array $options garage_id
      * @return array
      * @todo rename this to get_garage_items($garage_id) if we never use it without the option
@@ -388,15 +388,28 @@ class Database
     {
         //TODO Change to AND when WHERE query added in?
         $garage_query = isset($options['garage_id']) ? "WHERE garage_id='" . $this->escape($options['garage_id']) . "'" : '';
+
         $query = <<<SQL
-        SELECT  item_id,
-                garage_id,
-                name,
-                description,
-                visible,
-                updated_at,
-                created_at
+        SELECT item.item_id,
+               garage_id,
+               name,
+               description,
+               visible,
+               item.updated_at,
+               item.created_at,
+               image.image_id,
+               image.width,
+               image.height,
+               CONCAT(path, '/', filename) as source
         FROM item
+                 LEFT JOIN LATERAL (SELECT *
+                                    FROM item_image
+                                    WHERE item.item_id = item_image.item_id
+                                    ORDER BY main DESC
+                                    LIMIT 1) as iii
+            using (item_id)
+                 LEFT JOIN (SELECT *
+                            FROM image) as image using (image_id)
             {$garage_query}
         SQL;
 
@@ -662,6 +675,7 @@ class Database
 
         $this->insert_query($query);
     }
+
     /** Link an image to an item
      * @param string $item_id
      * @param string $image_id

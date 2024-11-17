@@ -1,6 +1,5 @@
 <?php
 
-use JetBrains\PhpStorm\NoReturn;
 
 /** Generate URL from WWW_ROOT + $script_path
  * @param string $script_path input
@@ -44,7 +43,7 @@ function h(?string $string = ""): string
 
 /** Return a 404 error
  */
-#[NoReturn] function error_404(): void
+function error_404(): void
 {
     header($_SERVER["SERVER_PROTOCOL"] . " 404 Page Not Found");
     exit();
@@ -52,7 +51,7 @@ function h(?string $string = ""): string
 
 /** Return a 500 error
  */
-#[NoReturn] function error_500(): void
+function error_500(): void
 {
     header($_SERVER["SERVER_PROTOCOL"] . " 500 Internal Server Error");
     exit();
@@ -60,7 +59,7 @@ function h(?string $string = ""): string
 
 /** Return a generic database error
  */
-#[NoReturn] function error_database(string $error_message = "Unspecified Database Error"): void
+function error_database(string $error_message = "Unspecified Database Error"): void
 {
     header($_SERVER["SERVER_PROTOCOL"] . " 500 " . $error_message);
     exit();
@@ -69,7 +68,7 @@ function h(?string $string = ""): string
 /** Return a 302 redirect to the provided location
  * @param string $location url to redirect to
  */
-#[NoReturn] function redirect_to(string $location): void
+function redirect_to(string $location): void
 {
     if (isset($db)) $db->disconnect();
     header('Location: ' . $location);
@@ -134,4 +133,36 @@ function rescale_image(array $image, int $max_size = 256): array
     $scale = $max_size / $max;
 
     return [floor($width * $scale), floor($height * $scale)];
+}
+
+/** Move and link uploaded images
+ * @param array $images Images from $_FILES
+ * @param int $item_id Item to link the new images to
+ * @return void
+ */
+function move_and_link_images(array $images, int $item_id): void
+{
+    global $db;
+    //Move and link images
+    foreach ($images as $image) {
+        //Check that this file is valid
+        if ($image['error'] != 0) continue;
+        //Get dimensions of image for database
+        list($width, $height) = getimagesize($image['tmp_name']);
+        $image['width'] = $width;
+        $image['height'] = $height;
+        $image['path'] = "item";
+
+        //Clean name and make unique
+        $path_info = pathinfo($image['name']);
+        $base = $path_info['filename'];
+        $base = preg_replace("/[^\w-]/", "_", $base);
+        $image['filename'] = time() . $base . "." . $path_info['extension'];
+
+        //TODO Check for success!
+        move_uploaded_file($image['tmp_name'], PUBLIC_PATH . '/images/' . $image['path'] . '/' . $image['filename']);
+        $image_id = $db->insert_image($image);
+        //Create item_image link
+        $db->insert_item_image($item_id, $image_id);
+    }
 }

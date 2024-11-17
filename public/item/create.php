@@ -25,29 +25,8 @@ if (is_post_request()) {
 
     $errors = validate_item($item, $_FILES);
     if (empty($errors)) {
-        //TODO This will create the item without images if they fail, validation should take care of this
         $item_id = $db->insert_item($item);
-        //Move and link images
-        foreach ($_FILES as $image) {
-            //Get dimensions of image for database
-            //Assume validation means they actually exist
-            list($width, $height) = getimagesize($image['tmp_name']);
-            $image['width'] = $width;
-            $image['height'] = $height;
-            $image['path'] = "item";
-
-            //Clean name and make unique
-            $path_info = pathinfo($image['name']);
-            $base = $path_info['filename'];
-            $base = preg_replace("/[^\w-]/", "_", $base);
-            $image['filename'] = time() . $base . "." . $path_info['extension'];
-
-            //TODO Check for success!
-            move_uploaded_file($image['tmp_name'], PUBLIC_PATH . '/images/' . $image['path'] . '/' . $image['filename']);
-            $image_id = $db->insert_image($image);
-            //Create item_image link
-            $db->insert_item_image($item_id, $image_id);
-        }
+        move_and_link_images($_FILES, $item_id);
 
         $_SESSION['message'] = 'Item created successfully';
         redirect_to(url_for('/item/show.php?id=' . $item_id));

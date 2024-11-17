@@ -26,30 +26,7 @@ if (is_post_request()) {
 
     if (empty($errors)) {
         $db->update_item($item);
-
-        //Move and link images
-        foreach ($_FILES as $image) {
-            //Check that this file is valid!
-            if ($image['error'] != 0) continue;
-            //Get dimensions of image for database
-            //Assume validation means they actually exist
-            list($width, $height) = getimagesize($image['tmp_name']);
-            $image['width'] = $width;
-            $image['height'] = $height;
-            $image['path'] = "item";
-
-            //Clean name and make unique
-            $path_info = pathinfo($image['name']);
-            $base = $path_info['filename'];
-            $base = preg_replace("/[^\w-]/", "_", $base);
-            $image['filename'] = time() . $base . "." . $path_info['extension'];
-
-            //TODO Check for success!
-            move_uploaded_file($image['tmp_name'], PUBLIC_PATH . '/images/' . $image['path'] . '/' . $image['filename']);
-            $image_id = $db->insert_image($image);
-            //Create item_image link
-            $db->insert_item_image($item['item_id'], $image_id);
-        }
+        move_and_link_images($_FILES, $item['item_id']);
 
         $_SESSION['message'] = 'Item updated successfully';
         redirect_to(url_for('/item/show.php?id=' . h(u($item['item_id']))));
