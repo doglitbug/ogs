@@ -16,6 +16,8 @@ if (!can_edit_item($item)) {
     redirect_to(url_for('/item/show.php?id=' . h(u($item['item_id']))));
 }
 
+$images = $db->get_item_images($item['item_id']);
+
 if (is_post_request()) {
     //garage_id pulled from database!
     $item['name'] = $_POST['name'] ?? '';
@@ -26,14 +28,26 @@ if (is_post_request()) {
 
     if (empty($errors)) {
         $db->update_item($item);
+        //Add new images
         move_and_link_images($_FILES, $item['item_id']);
+
+        //Remove deleted images
+        if (isset($_POST['delete'])) {
+            foreach ($_POST['delete'] as $image_id) {
+                $image = $db->get_image($image_id);
+                //Check it exists and belongs to item (no form tampering!)
+                if (!$image || !in_array($image_id, array_column($images, 'image_id'))) break;
+                //Must delete item_image links first
+                unlink(PUBLIC_PATH . '/images/' . $image['source']);
+                //Remove from images (will cascade to item_image)
+                $db->delete_image($image);
+            }
+        }
 
         $_SESSION['message'] = 'Item updated successfully';
         redirect_to(url_for('/item/show.php?id=' . h(u($item['item_id']))));
     }
 }
-
-$images = $db->get_item_images($item['item_id']);
 
 $page_title = 'Edit Item';
 include(SHARED_PATH . '/public_header.php');
@@ -82,15 +96,29 @@ include(SHARED_PATH . '/public_header.php');
             </div>
             <div class="row">
                 <h3>Images:</h3>
-                <div class="images">
-                    <?php foreach ($images as $image) {
-                        list($width, $height) = rescale_image($image);
+                <?php foreach ($images as $image) {
+                    list($width, $height) = rescale_image($image);
+                    $id = $image['image_id'];
+                    ?>
+                    <div class="col-xl-4">
+                        <a href="<?php echo url_for('image/show.php?id=' . h(u($id))); ?>">
+                            <img src="<?php echo url_for('images/' . $image['source']); ?>"
+                                 width="<?php echo $width; ?>"
+                                 height="<?php echo $height; ?>">
+                        </a>
 
-                        echo '<a href="' . url_for('image/show.php?id=' . h(u($image['image_id']))) . '">';
-                        echo '<img src="' . url_for('images/' . $image['source']) . '" width="' . $width . '" height="' . $height . '">';
-                        echo '</a>';
-                    } ?>
-                </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="delete[]"
+                                   id="del_<?php echo u($id); ?>"
+                                   value="<?php echo u($id); ?>"
+                                <?php if (isset($_POST['delete']) && in_array($id, $_POST['delete'])) echo 'checked'; ?>
+                            >
+                            <label class="form-check-label" for="del_<?php echo u($id); ?>">
+                                Delete?
+                            </label>
+                        </div>
+                    </div>
+                <?php } ?>
             </div>
             <div class="row">
                 <div class="col-xl-6">

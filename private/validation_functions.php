@@ -209,8 +209,8 @@ function validate_images(array $images): string|null
         switch ($image['error']) {
             case UPLOAD_ERR_OK:
                 //Check size
-                if ($image['size'] > 1048576 * 2) {
-                    return "Image must be less than 2 MB in size";
+                if ($image['size'] > 1048576 * 5) {
+                    return "Image must be less than 5 MB in size";
                 }
                 //Check file type on actual file
                 $image['type'] = $file_info->file($image['tmp_name']);
@@ -221,7 +221,7 @@ function validate_images(array $images): string|null
             case UPLOAD_ERR_NO_FILE:
                 break;
             case UPLOAD_ERR_INI_SIZE:
-                return "Image must be less than 2 MB in size";
+                return "Image must be less than 5 MB in size";
             default:
                 //TODO Log this error for webmaster
                 return $phpFileUploadErrors[$image['error']];
