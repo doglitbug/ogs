@@ -58,7 +58,7 @@ include(SHARED_PATH . '/public_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>">Back</a>
+               href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><i class="bi bi-arrow-left"></i>Back</a>
         </div>
 
         <form action="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>" method="post"

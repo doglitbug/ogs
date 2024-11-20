@@ -19,17 +19,17 @@ include(SHARED_PATH . '/public_header.php');
         <h1><?php echo $page_title; ?></h1>
 
         <div class="cta">
-            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>">Back</a>
+            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>"><i class="bi bi-arrow-left"></i>Back</a>
             <?php if (is_logged_in()) { ?>
-                <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>">Create new
+                <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>"><i class="bi bi-plus-lg"></i>New
                     Garage</a>
             <?php } ?>
             <?php if (is_owner($garage['garage_id'])) { ?>
                 <a class="btn btn-warning action"
-                   href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">Edit
+                   href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>"><i class="bi bi-pencil"></i>Edit
                     Garage</a>
                 <a class="btn btn-danger action"
-                   href="<?php echo url_for('/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>">Delete
+                   href="<?php echo url_for('/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>"><i class="bi bi-trash3"></i>Delete
                     Garage</a>
             <?php } ?>
         </div>
@@ -64,7 +64,7 @@ include(SHARED_PATH . '/public_header.php');
             ?>
             <div class="cta">
                 <a class="btn btn-success action"
-                   href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>">Add
+                   href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>"><i class="bi bi-plus-lg"></i>Add
                     Item</a>
             </div>
         <?php } ?>

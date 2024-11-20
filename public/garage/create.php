@@ -28,7 +28,7 @@ if (is_post_request()) {
 
 $locations = $db->get_all_locations();
 
-$garage_title = 'Add Garage';
+$garage_title = 'New Garage';
 include(SHARED_PATH . '/public_header.php');
 ?>
 
@@ -36,7 +36,7 @@ include(SHARED_PATH . '/public_header.php');
         <h1><?php echo $garage_title; ?></h1>
 
         <div class="cta">
-            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>">Back</a>
+            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>"><i class="bi bi-arrow-left"></i>Back</a>
         </div>
 
         <p>

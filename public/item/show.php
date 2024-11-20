@@ -22,16 +22,15 @@ include(SHARED_PATH . '/public_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/garage/show.php?id=' . h(u($item['garage_id']))); ?>">Back</a>
+               href="<?php echo url_for('/garage/show.php?id=' . h(u($item['garage_id']))); ?>"><i class="bi bi-arrow-left"></i>Back</a>
             <?php if (can_edit_item($item)) { ?>
 
                 <a class="btn btn-success action"
-                   href="<?php echo url_for('/item/create.php?garage_id=' . h(u($item['garage_id']))); ?>">Add</a>
-
+                   href="<?php echo url_for('/item/create.php?garage_id=' . h(u($item['garage_id']))); ?>"><i class="bi bi-plus-lg"></i>Add Item</a>
                 <a class="btn btn-warning action"
-                   href="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>">Edit</a>
+                   href="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>"><i class="bi bi-pencil"></i>Edit Item</a>
                 <a class="btn btn-danger action"
-                   href="<?php echo url_for('/item/delete.php?id=' . h(u($item['item_id']))); ?>">Delete</a>
+                   href="<?php echo url_for('/item/delete.php?id=' . h(u($item['item_id']))); ?>"><i class="bi bi-trash3"></i>Delete Item</a>
             <?php } ?>
         </div>
 
