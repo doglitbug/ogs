@@ -123,10 +123,8 @@ function validate_garage(array $garage): array
     }
 
     #description
-    if (is_blank($garage['description'])) {
-        $errors['description'] = "Description cannot be blank";
-    } else if (!has_length($garage['description'], ['min' => 2, 'max' => 255])) {
-        $errors['description'] = "Description must be between 2 and 255 characters";
+    if (has_length_greater_than($garage['description'], 2048)) {
+        $errors['description'] = "Description must be less than 2048 characters";
     }
 
     #location
@@ -159,10 +157,8 @@ function validate_item(array $item, $files): array
     }
 
     #description
-    if (is_blank($item['description'])) {
-        $errors['description'] = "Description cannot be blank";
-    } else if (!has_length($item['description'], ['min' => 2, 'max' => 255])) {
-        $errors['description'] = "Description must be between 2 and 255 characters";
+    if (has_length_greater_than($item['description'],2048)) {
+        $errors['description'] = "Description must be less than 2048 characters";
     }
 
     #images
@@ -186,6 +182,8 @@ function validate_item(array $item, $files): array
  */
 function validate_images(array $images): string|null
 {
+    if (empty($images)) return null;
+
     $phpFileUploadErrors = array(
         0 => 'There is no error, the file uploaded with success',
         1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
@@ -200,8 +198,6 @@ function validate_images(array $images): string|null
     $acceptable_types = array(
         "image/gif", "image/png", "image/jpeg"
     );
-
-    if (empty($images)) return null;
 
     $file_info = new finfo(FILEINFO_MIME_TYPE);
 

@@ -41,6 +41,16 @@ function h(?string $string = ""): string
     return htmlspecialchars($string);
 }
 
+/** Attempt to clean up user input
+ * @param string $input
+ * @param array $allowed_tags defaults to b, i
+ * @return string
+ */
+function clean_input(string $input, array $allowed_tags = ['b', 'i'])
+{
+    return trim(strip_tags($input, $allowed_tags));
+}
+
 /** Return a 404 error
  */
 function error_404(): void

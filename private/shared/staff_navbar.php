@@ -3,8 +3,7 @@ $sections = array(
     "Users" => url_for("staff/user"),
     "Garages" => url_for("staff/garage"),
     "Items" => url_for("staff/item"),
-    "Profile" => url_for('auth/profile.php'),
-    "Customer account" => url_for("/"),
+    "Customer" => url_for("/"),
     "Log out" => url_for('auth/logout.php')
 );
 

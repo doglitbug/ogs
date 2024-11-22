@@ -31,7 +31,7 @@ class Database
      */
     public function escape(string $string): string
     {
-        $string = filter_var($string, FILTER_UNSAFE_RAW, FILTER_FLAG_ENCODE_LOW | FILTER_FLAG_STRIP_HIGH);
+        $string = filter_var($string, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH);
         return $this->connection->real_escape_string($string);
     }
 
@@ -380,14 +380,19 @@ class Database
 
 #region item
     /** Get items, usually from an individual garage with primary image
-     * @param array $options garage_id
+     * @param array $options garage_id Filter to particular garage
+     *                       search Filter to search
      * @return array
-     * @todo rename this to get_garage_items($garage_id) if we never use it without the option
      */
     public function get_all_items(array $options = []): array
     {
-        //TODO Change to AND when WHERE query added in?
-        $garage_query = isset($options['garage_id']) ? "WHERE garage_id='" . $this->escape($options['garage_id']) . "'" : '';
+        if (isset($options['garage_id'])) {
+            $extra_queries[] = "garage_id='" . $this->escape($options['garage_id']) . "'";
+        }
+
+        if (isset($options['search'])) {
+            $extra_queries[] = "MATCH(item.name, item.description) AGAINST('" . $this->escape($options['search']) . "')";
+        }
 
         $query = <<<SQL
         SELECT item.item_id,
@@ -410,8 +415,16 @@ class Database
             using (item_id)
                  LEFT JOIN (SELECT *
                             FROM image) as image using (image_id)
-            {$garage_query}
         SQL;
+
+        if (isset($extra_queries)) {
+            //First query needs to add WHERE
+            $query .= "\nWHERE " . $extra_queries[0];
+            //Subsequent queries need AND
+            for ($i = 1; $i < sizeof($extra_queries); $i++) {
+                $query .= "\nAND " . $extra_queries[$i];
+            }
+        }
 
         return $this->get_query($query);
     }

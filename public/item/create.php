@@ -19,8 +19,8 @@ if (!is_owner_or_worker($garage)) {
 
 if (is_post_request()) {
     $item['garage_id'] = $garage['garage_id'];
-    $item['name'] = $_POST['name'] ?? '';
-    $item['description'] = $_POST['description'] ?? '';
+    $item['name'] = clean_input($_POST['name'], []) ?? '';
+    $item['description'] = clean_input($_POST['description']) ?? '';
     $item['visible'] = $_POST['visible'] ?? '';
 
     $errors = validate_item($item, $_FILES);
@@ -46,7 +46,8 @@ include(SHARED_PATH . '/public_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>"><i class="bi bi-arrow-left"></i>Back</a>
+               href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>"><i
+                        class="bi bi-arrow-left"></i>Back</a>
         </div>
 
         <form action="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>" method="post"
@@ -62,9 +63,9 @@ include(SHARED_PATH . '/public_header.php');
                 </div>
                 <div class="col-xl-6">
                     <label for="description" class="form-label">Description</label>
-                    <input type="text" class="form-control" placeholder="Item description" aria-label="Description"
-                           name="description"
-                           value="<?php echo h($item['description']); ?>">
+                    <textarea class="form-control" placeholder="Item description" aria-label="Description"
+                              name="description"
+                              rows="5"><?php echo $item['description']; ?></textarea>
                     <?php if (isset($errors['description'])) {
                         echo '<div class="text-danger">' . $errors['description'] . '</div>';
                     } ?>

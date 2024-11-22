@@ -18,8 +18,8 @@ if (!is_owner($garage['garage_id'])) {
 
 if (is_post_request()) {
     $garage['garage_id'] = $garage['garage_id'];
-    $garage['name'] = $_POST['name'] ?? '';
-    $garage['description'] = $_POST['description'] ?? '';
+    $garage['name'] = clean_input($_POST['name'], []) ?? '';
+    $garage['description'] = clean_input($_POST['description']) ?? '';
     $garage['location_id'] = $_POST['location'] ?? '';
     $garage['visible'] = $_POST['visible'] ?? '';
 
@@ -30,8 +30,6 @@ if (is_post_request()) {
         $_SESSION['message'] = 'Garage updated successfully';
         redirect_to(url_for('/garage/show.php?id=' . $garage['garage_id']));
     }
-} else {
-
 }
 
 $locations = $db->get_all_locations();
@@ -45,7 +43,8 @@ include(SHARED_PATH . '/public_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>"><i class="bi bi-arrow-left"></i>Back</a>
+               href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>"><i
+                        class="bi bi-arrow-left"></i>Back</a>
         </div>
 
         <form action="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>" method="post">
@@ -61,9 +60,9 @@ include(SHARED_PATH . '/public_header.php');
                 </div>
                 <div class="col-xl-6">
                     <label for="description" class="form-label">Description</label>
-                    <input type="text" class="form-control" placeholder="Garage description" aria-label="Description"
-                           name="description"
-                           value="<?php echo h($garage['description']); ?>">
+                    <textarea type="text" class="form-control" placeholder="Garage description" aria-label="Description"
+                              name="description"
+                              rows="5"><?php echo $garage['description']; ?></textarea>
                     <?php if (isset($errors['description'])) {
                         echo '<div class="text-danger">' . $errors['description'] . '</div>';
                     } ?>

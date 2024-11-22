@@ -48,7 +48,7 @@ include(SHARED_PATH . '/public_header.php');
                 <tbody>
                 <tr>
                     <td><?php echo h($item['name']); ?></td>
-                    <td><?php echo h($item['description']); ?></td>
+                    <td><?php echo $item['description']; ?></td>
                     <?php if (can_edit_item($item)) { ?>
                         <td><?php echo $item['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                     <?php } ?>

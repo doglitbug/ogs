@@ -49,7 +49,7 @@ include(SHARED_PATH . '/public_header.php');
                 <tbody>
                 <tr>
                     <td><?php echo h($garage['name']); ?></td>
-                    <td><?php echo h($garage['description']); ?></td>
+                    <td><?php echo $garage['description']; ?></td>
                     <td><?php echo h($garage['location']); ?></td>
                     <?php if (is_owner_or_worker($garage)) { ?>
                         <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
@@ -101,7 +101,7 @@ include(SHARED_PATH . '/public_header.php');
                         <td>
                             <a href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><?php echo h($item['name']); ?></a>
                         </td>
-                        <td><?php echo h($item['description']); ?></td>
+                        <td><?php echo $item['description']; ?></td>
                         <?php if (is_owner_or_worker($garage)) { ?>
                             <td><?php echo $item['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                         <?php } ?>

@@ -3,7 +3,7 @@ global $db;
 require_once('../../private/initialize.php');
 require_login();
 
-$id = $_GET['id'] ?? '1';
+$id = $_GET['id'] ?? '0';
 
 $item = $db->get_item($id);
 if ($item == null) {
@@ -20,8 +20,8 @@ $images = $db->get_item_images($item['item_id']);
 
 if (is_post_request()) {
     //garage_id pulled from database!
-    $item['name'] = $_POST['name'] ?? '';
-    $item['description'] = $_POST['description'] ?? '';
+    $item['name'] = clean_input($_POST['name'], []) ?? '';
+    $item['description'] = clean_input($_POST['description']) ?? '';
     $item['visible'] = $_POST['visible'] ?? '';
 
     $errors = validate_item($item, $_FILES);
@@ -58,7 +58,8 @@ include(SHARED_PATH . '/public_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><i class="bi bi-arrow-left"></i>Back</a>
+               href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><i
+                        class="bi bi-arrow-left"></i>Back</a>
         </div>
 
         <form action="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>" method="post"
@@ -74,9 +75,9 @@ include(SHARED_PATH . '/public_header.php');
                 </div>
                 <div class="col-xl-6">
                     <label for="description" class="form-label">Description</label>
-                    <input type="text" class="form-control" placeholder="Item description" aria-label="Description"
-                           name="description"
-                           value="<?php echo h($item['description']); ?>">
+                    <textarea class="form-control" placeholder="Item description" aria-label="Description"
+                              name="description"
+                              rows="5"><?php echo $item['description']; ?></textarea>
                     <?php if (isset($errors['description'])) {
                         echo '<div class="text-danger">' . $errors['description'] . '</div>';
                     } ?>

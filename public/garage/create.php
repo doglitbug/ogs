@@ -6,8 +6,8 @@ require_login();
 $garage = [];
 
 if (is_post_request()) {
-    $garage['name'] = $_POST['name'] ?? '';
-    $garage['description'] = $_POST['description'] ?? '';
+    $garage['name'] = clean_input($_POST['name'], []) ?? '';
+    $garage['description'] = clean_input($_POST['description']) ?? '';
     $garage['location_id'] = $_POST['location'] ?? '';
     $garage['visible'] = $_POST['visible'] ?? '';
 
@@ -36,7 +36,8 @@ include(SHARED_PATH . '/public_header.php');
         <h1><?php echo $garage_title; ?></h1>
 
         <div class="cta">
-            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>"><i class="bi bi-arrow-left"></i>Back</a>
+            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>"><i
+                        class="bi bi-arrow-left"></i>Back</a>
         </div>
 
         <p>
@@ -56,15 +57,14 @@ include(SHARED_PATH . '/public_header.php');
                 </div>
                 <div class="col-xl-6">
                     <label for="description" class="form-label">Description</label>
-                    <input type="text" class="form-control" placeholder="Garage description" aria-label="Description"
-                           name="description"
-                           value="<?php echo h($garage['description']); ?>">
+                    <textarea class="form-control" placeholder="Garage description" aria-label="Description"
+                              name="description"
+                              rows="5"><?php echo $garage['description']; ?></textarea>
                     <?php if (isset($errors['description'])) {
                         echo '<div class="text-danger">' . $errors['description'] . '</div>';
                     } ?>
                 </div>
             </div>
-
             <div class="row">
                 <div class="col-xl-6">
                     <label for="location" class="form-label">Location</label>
