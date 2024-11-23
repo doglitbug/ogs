@@ -98,7 +98,7 @@ include(SHARED_PATH . '/public_header.php');
             <div class="row">
                 <h3>Images:</h3>
                 <?php foreach ($images as $image) {
-                    list($width, $height) = rescale_image($image);
+                    list($width, $height) = rescale_image_size($image);
                     $id = $image['image_id'];
                     ?>
                     <div class="col-xl-4">

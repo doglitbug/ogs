@@ -31,8 +31,19 @@ class Database
      */
     public function escape(string $string): string
     {
+        //Removed FILTER_FLAG_STRIP_LOW so that \r\n are not turned into &#13;&#10;
         $string = filter_var($string, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH);
         return $this->connection->real_escape_string($string);
+    }
+
+    /** Generate pagination SQL
+     * @return string LIMIT x, y
+     */
+    private function generate_pagination_sql(): string
+    {
+        list($page, $size) = get_page_and_size();
+        $offset = ($page - 1) * $size;
+        return "\nLIMIT {$offset}, {$size}";
     }
 
     /**
@@ -40,7 +51,8 @@ class Database
      * @param string $query Escaped query string
      * @return array Results
      */
-    private function get_query(string $query): array
+    private
+    function get_query(string $query): array
     {
         try {
             $result = $this->connection->query($query);
@@ -60,7 +72,8 @@ class Database
      * @param string $query Escaped query string
      * @return int new ID
      */
-    private function insert_query(string $query): int
+    private
+    function insert_query(string $query): int
     {
         try {
             $result = $this->connection->query($query);
@@ -77,7 +90,8 @@ class Database
      * Perform an update query
      * @param string $query Escaped query string
      */
-    private function update_query(string $query): void
+    private
+    function update_query(string $query): void
     {
         try {
             $result = $this->connection->query($query);
@@ -93,7 +107,8 @@ class Database
      * Perform a delete query
      * @param string $query Escaped query string
      */
-    private function delete_query(string $query): void
+    private
+    function delete_query(string $query): void
     {
         try {
             $result = $this->connection->query($query);
@@ -105,13 +120,14 @@ class Database
         }
     }
 
-    #endregion
+#endregion
 
-    #region user
+#region user
     /** Get first 10 users, used for debugging at this time
      * @return array
      */
-    public function get_all_users(): array
+    public
+    function get_all_users(): array
     {
         $query = <<<SQL
         SELECT  user_id,
@@ -132,7 +148,8 @@ class Database
         return $this->get_query($query);
     }
 
-    public function get_user(string $user_id): array
+    public
+    function get_user(string $user_id): array
     {
         $user_id = $this->escape($user_id);
 
@@ -160,7 +177,8 @@ class Database
      * @param string $email
      * @return array
      */
-    public function get_user_by_email(string $email): array
+    public
+    function get_user_by_email(string $email): array
     {
         $email = $this->escape($email);
 
@@ -191,7 +209,8 @@ class Database
      * @param string $email
      * @return bool
      */
-    public function check_email_exists(string $email): bool
+    public
+    function check_email_exists(string $email): bool
     {
         return $this->get_user_by_email($email) !== [];
     }
@@ -200,7 +219,8 @@ class Database
      * @param string $user_id
      * @return string
      */
-    public function get_access_level(string $user_id): string
+    public
+    function get_access_level(string $user_id): string
     {
         $user_id = $this->escape($user_id);
 
@@ -220,14 +240,16 @@ class Database
             return "";
         }
     }
-    #endregion
 
-    #region garage
+#endregion
+
+#region garage
     /** Get all garages
      * @param array $options
      * @return array
      */
-    public function get_all_garages(array $options = []): array
+    public
+    function get_all_garages(array $options = []): array
     {
         $visible_query = isset($options['visible']) ? "WHERE visible = '" . $this->escape($options['visible']) . "'" : "";
 
@@ -251,7 +273,8 @@ class Database
      * @param string $garage_id
      * @return array
      */
-    public function get_garage(string $garage_id): array
+    public
+    function get_garage(string $garage_id): array
     {
         $garage_id = $this->escape($garage_id);
 
@@ -285,7 +308,8 @@ class Database
      * @return array
      * TODO Do this as an option/filter in get_all_garages?
      */
-    public function get_garages_by_user(string $user_id, array $options = []): array
+    public
+    function get_garages_by_user(string $user_id, array $options = []): array
     {
         $user_id = $this->escape($user_id);
         $access_query = isset($options['access']) ? "AND access.description='" . $this->escape($options['access']) . "'" : '';
@@ -314,7 +338,8 @@ class Database
      * @return int New ID
      * @note This does not set ownership or access at all!
      */
-    public function insert_garage(array $garage): int
+    public
+    function insert_garage(array $garage): int
     {
         $name = $this->escape($garage['name']);
         $description = $this->escape($garage['description']);
@@ -338,7 +363,8 @@ class Database
      * @param array $garage
      * @return void
      */
-    public function update_garage(array $garage): void
+    public
+    function update_garage(array $garage): void
     {
         $garage_id = $this->escape($garage['garage_id']);
         $name = $this->escape($garage['name']);
@@ -363,7 +389,8 @@ class Database
      * @param array $garage
      * @return void
      */
-    public function delete_garage(array $garage): void
+    public
+    function delete_garage(array $garage): void
     {
         $garage_id = $this->escape($garage['garage_id']);
 
@@ -380,11 +407,13 @@ class Database
 
 #region item
     /** Get items, usually from an individual garage with primary image
-     * @param array $options garage_id Filter to particular garage
-     *                       search Filter to search
+     * @param array $options garage_id: Filter to particular garage
+     *                       search: Filter to search
+     *                       visible: Hide hidden items (required for pagination to work)
+     *                       paginate: Use pagination to return only a subset
      * @return array
      */
-    public function get_all_items(array $options = []): array
+    public function get_items(array $options = []): array
     {
         if (isset($options['garage_id'])) {
             $extra_queries[] = "garage_id='" . $this->escape($options['garage_id']) . "'";
@@ -392,6 +421,11 @@ class Database
 
         if (isset($options['search'])) {
             $extra_queries[] = "MATCH(item.name, item.description) AGAINST('" . $this->escape($options['search']) . "')";
+        }
+
+        //TODO Hide if garage is hidden as well?
+        if (isset($options['visible'])) {
+            $extra_queries[] = "visible='" . $this->escape($options['visible']) . "'";
         }
 
         $query = <<<SQL
@@ -426,6 +460,10 @@ class Database
             }
         }
 
+        if(isset($options['paginate'])) {
+            $query .= $this->generate_pagination_sql();
+        }
+
         return $this->get_query($query);
     }
 
@@ -434,7 +472,8 @@ class Database
      * @param array $options public: garage hidden will override visibility
      * @return array
      */
-    public function get_item(string $item_id, array $options = []): array
+    public
+    function get_item(string $item_id, array $options = []): array
     {
         $item_id = $this->escape($item_id);
 
@@ -464,7 +503,8 @@ class Database
      * @param array $item
      * @return int
      */
-    public function insert_item(array $item): int
+    public
+    function insert_item(array $item): int
     {
         $garage_id = $this->escape($item['garage_id']);
         $name = $this->escape($item['name']);
@@ -484,7 +524,8 @@ class Database
         return $this->insert_query($query);
     }
 
-    public function update_item(array $item): void
+    public
+    function update_item(array $item): void
     {
         $item_id = $this->escape($item['item_id']);
         $garage_id = $this->escape($item['item_id']);
@@ -507,7 +548,8 @@ class Database
      * @param array $item
      * @return void
      */
-    public function delete_item(array $item): void
+    public
+    function delete_item(array $item): void
     {
         $item_id = $this->escape($item['item_id']);
 
@@ -573,7 +615,8 @@ class Database
      * @param string $garage_id
      * @return string Owner|Worker|User
      */
-    public function get_user_access(string $user_id, string $garage_id): string
+    public
+    function get_user_access(string $user_id, string $garage_id): string
     {
         $user_id = $this->escape($user_id);
         $garage_id = $this->escape($garage_id);
@@ -591,13 +634,15 @@ class Database
 
         return $this->get_query($query)[0]['access'];
     }
+
 #endregion
 #region image
     /** Get a single image from the database
      * @param string $image_id
      * @return array
      */
-    public function get_image(string $image_id): array
+    public
+    function get_image(string $image_id): array
     {
         $image_id = $this->escape($image_id);
 
@@ -622,7 +667,8 @@ class Database
      * @param string $item_id
      * @return array
      */
-    public function get_item_images(string $item_id): array
+    public
+    function get_item_images(string $item_id): array
     {
         $item_id = $this->escape($item_id);
 
@@ -646,7 +692,8 @@ class Database
      * @param array $image
      * @return int image_id
      */
-    public function insert_image(array $image): int
+    public
+    function insert_image(array $image): int
     {
         $width = $this->escape($image['width']);
         $height = $this->escape($image['height']);
@@ -672,7 +719,8 @@ class Database
      * @param string $main is this the main image?
      * @return void
      */
-    public function insert_garage_image(string $garage_id, string $image_id, string $main = "0"): void
+    public
+    function insert_garage_image(string $garage_id, string $image_id, string $main = "0"): void
     {
         $garage_id = $this->escape($garage_id);
         $image_id = $this->escape($image_id);
@@ -695,7 +743,8 @@ class Database
      * @param string $main is this the main image?
      * @return void
      */
-    public function insert_item_image(string $item_id, string $image_id, string $main = "0"): void
+    public
+    function insert_item_image(string $item_id, string $image_id, string $main = "0"): void
     {
         $item_id = $this->escape($item_id);
         $image_id = $this->escape($image_id);
@@ -717,7 +766,8 @@ class Database
      * @param array $image
      * @return void
      */
-    public function delete_image(array $image): void
+    public
+    function delete_image(array $image): void
     {
         $image_id = $this->escape($image['image_id']);
 

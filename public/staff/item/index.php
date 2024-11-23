@@ -2,8 +2,8 @@
 global $db;
 require_once('../../../private/initialize.php');
 require_admin();
-
-$items = $db->get_all_items();
+//TODO Add pagination!
+$items = $db->get_items();
 $page_title = 'Items';
 include(SHARED_PATH . '/staff_header.php');
 ?>

@@ -60,7 +60,7 @@ include(SHARED_PATH . '/public_header.php');
         <h3>Images:</h3>
         <div class="images">
             <?php foreach ($images as $image) {
-                list($width, $height) = rescale_image($image);
+                list($width, $height) = rescale_image_size($image);
 
                 echo '<a href="' . url_for('image/show.php?id=' . h(u($image['image_id']))) . '">';
                 echo '<img src="' . url_for('images/' . $image['source']) . '" width="' . $width . '" height="' . $height . '">';

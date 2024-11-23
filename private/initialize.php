@@ -15,15 +15,21 @@ $public_end = strpos($_SERVER['SCRIPT_NAME'], '/public') + 7;
 $doc_root = substr($_SERVER['SCRIPT_NAME'], 0, $public_end);
 define("WWW_ROOT", $doc_root);
 
-require_once('http_functions.php');
-require_once('auth_functions.php');
-require_once('access_functions.php');
-
 //Load Environment variables
 require_once('DotEnv.php');
 $dotenv = new DotEnv(PRIVATE_PATH . '/.env');
 $dotenv->load();
 
+//Connect to database
+require_once('database_functions.php');
+$db = new Database();
+$db->connect();
+
+require_once('http_functions.php');
+require_once('auth_functions.php');
+require_once('access_functions.php');
+require_once('misc_functions.php');
+require_once('validation_functions.php');
 
 if ($_ENV['APPLICATION_ENV'] == "PROD") {
     //Show errors in the browser?
@@ -32,11 +38,3 @@ if ($_ENV['APPLICATION_ENV'] == "PROD") {
     //Allow Google auth on laptop at work
     $_ENV['google_oauth_redirect_uri'] = "http://".$_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
 }
-
-//Connect to database
-require_once('database_functions.php');
-$db = new Database();
-$db->connect();
-
-//Validation functions (requires $db to already be set up)
-require_once('validation_functions.php');

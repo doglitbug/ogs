@@ -18,7 +18,7 @@ if (!is_owner($id)) {
 }
 
 if (is_post_request()) {
-    $item_count = count($db->get_all_items(['garage_id' => $garage['garage_id']]));
+    $item_count = count($db->get_items(['garage_id' => $garage['garage_id']]));
     if ($item_count != 0) {
         $_SESSION['error'] = 'Garage must be empty to delete';
     } else {

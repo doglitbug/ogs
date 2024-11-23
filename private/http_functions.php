@@ -46,9 +46,10 @@ function h(?string $string = ""): string
  * @param array $allowed_tags defaults to b, i
  * @return string
  */
-function clean_input(string $input, array $allowed_tags = ['b', 'i'])
+function clean_input(string $input, array $allowed_tags = ['b', 'i']): string
 {
-    return trim(strip_tags($input, $allowed_tags));
+    global $db;
+    return $db->escape(trim(strip_tags($input, $allowed_tags)));
 }
 
 /** Return a 404 error
@@ -101,78 +102,3 @@ function is_get_request(): bool
     return $_SERVER['REQUEST_METHOD'] == 'GET';
 }
 
-/** Print out a session stored message and unset it
- * @param string $name message
- * @param string $type Bootstrap alert type
- * @return void
- */
-function print_and_delete(string $name, string $type = "primary"): void
-{
-    if (!isset($_SESSION[$name]) || $_SESSION[$name] == "") {
-        return;
-    }
-
-    echo '<div class="alert alert-' . $type . ' alert-dismissible fade show" role="alert">';
-    echo h($_SESSION[$name]);
-    echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
-    echo '</div>';
-    unset($_SESSION[$name]);
-}
-
-/** Debug.print a variable
- * @param mixed $variable Variable to print out
- * @return void
- */
-function dump(mixed $variable): void
-{
-    echo '<pre>';
-    print_r($variable);
-    echo '</pre>';
-}
-
-/** Provides new width and height for an image, scaled to the provided size
- * @param array $image
- * @param int $max_size maximum size for width/height
- * @return array new width, new height
- */
-function rescale_image(array $image, int $max_size = 256): array
-{
-    $width = $image['width'];
-    $height = $image['height'];
-    $max = max($width, $height);
-    $scale = $max_size / $max;
-
-    return [floor($width * $scale), floor($height * $scale)];
-}
-
-/** Move and link uploaded images
- * @param array $images Images from $_FILES
- * @param int $item_id Item to link the new images to
- * @return void
- */
-function move_and_link_images(array $images, int $item_id): void
-{
-    global $db;
-    //Move and link images
-    foreach ($images as $image) {
-        //Check that this file is valid
-        if ($image['error'] != 0) continue;
-        //Get dimensions of image for database
-        list($width, $height) = getimagesize($image['tmp_name']);
-        $image['width'] = $width;
-        $image['height'] = $height;
-        $image['path'] = "item";
-
-        //Clean name and make unique
-        $path_info = pathinfo($image['name']);
-        $base = $path_info['filename'];
-        $base = preg_replace("/[^\w-]/", "_", $base);
-        $image['filename'] = time() . $base . "." . $path_info['extension'];
-
-        //TODO Check for success!
-        move_uploaded_file($image['tmp_name'], PUBLIC_PATH . '/images/' . $image['path'] . '/' . $image['filename']);
-        $image_id = $db->insert_image($image);
-        //Create item_image link
-        $db->insert_item_image($item_id, $image_id);
-    }
-}

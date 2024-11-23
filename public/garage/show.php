@@ -9,7 +9,15 @@ if ($garage == null || ($garage['visible'] == '0' && !is_owner_or_worker($garage
     $_SESSION['error'] = 'Garage not found';
     redirect_to(url_for('/garage/index.php'));
 }
-$items = $db->get_all_items(['garage_id' => $garage['garage_id']]);
+
+$options['garage_id'] = $garage['garage_id'];
+
+//Hide hidden items unless owner/worker
+if (!is_owner_or_worker($garage)) $options['visible'] = '1';
+$max_items = sizeof($db->get_items($options));
+
+$options['paginate'] = 'true';
+$shown_items = $db->get_items($options);
 
 $page_title = 'Show Garage: ' . h($garage['name']);
 include(SHARED_PATH . '/public_header.php');
@@ -19,17 +27,21 @@ include(SHARED_PATH . '/public_header.php');
         <h1><?php echo $page_title; ?></h1>
 
         <div class="cta">
-            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>"><i class="bi bi-arrow-left"></i>Back</a>
+            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>"><i
+                        class="bi bi-arrow-left"></i>Back</a>
             <?php if (is_logged_in()) { ?>
-                <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>"><i class="bi bi-plus-lg"></i>New
+                <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>"><i
+                            class="bi bi-plus-lg"></i>New
                     Garage</a>
             <?php } ?>
             <?php if (is_owner($garage['garage_id'])) { ?>
                 <a class="btn btn-warning action"
-                   href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>"><i class="bi bi-pencil"></i>Edit
+                   href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>"><i
+                            class="bi bi-pencil"></i>Edit
                     Garage</a>
                 <a class="btn btn-danger action"
-                   href="<?php echo url_for('/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>"><i class="bi bi-trash3"></i>Delete
+                   href="<?php echo url_for('/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>"><i
+                            class="bi bi-trash3"></i>Delete
                     Garage</a>
             <?php } ?>
         </div>
@@ -64,7 +76,8 @@ include(SHARED_PATH . '/public_header.php');
             ?>
             <div class="cta">
                 <a class="btn btn-success action"
-                   href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>"><i class="bi bi-plus-lg"></i>Add
+                   href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>"><i
+                            class="bi bi-plus-lg"></i>Add
                     Item</a>
             </div>
         <?php } ?>
@@ -82,13 +95,12 @@ include(SHARED_PATH . '/public_header.php');
                 </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($items as $item) {
-                    if ($item['visible'] == '0' && !can_edit_item($item)) continue;
+                <?php foreach ($shown_items as $item) {
                     ?>
                     <tr>
                         <td><?php
                             if ($item['image_id'] != 0) {
-                                list($width, $height) = rescale_image($item, 96);
+                                list($width, $height) = rescale_image_size($item, 96);
 
                                 echo '<a href="' . url_for('image/show.php?id=' . h(u($item['image_id']))) . '">';
                                 echo '<img src="' . url_for('images/' . h($item['source'])) . '" width="' . $width . '" height="' . $height . '">';
@@ -109,6 +121,7 @@ include(SHARED_PATH . '/public_header.php');
                 <?php } ?>
                 </tbody>
             </table>
+            <?php generate_pagination_links($max_items); ?>
         </div>
     </div>
 
