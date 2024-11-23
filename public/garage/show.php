@@ -14,8 +14,8 @@ $options['garage_id'] = $garage['garage_id'];
 
 //Hide hidden items unless owner/worker
 if (!is_owner_or_worker($garage)) $options['visible'] = '1';
-$max_items = sizeof($db->get_items($options));
 
+$max_items = sizeof($db->get_items($options));
 $options['paginate'] = 'true';
 $shown_items = $db->get_items($options);
 
@@ -71,7 +71,7 @@ include(SHARED_PATH . '/public_header.php');
             </table>
         </div>
 
-        <h1>Items</h1>
+        <h1>Items: <?php echo $max_items ?> found</h1>
         <?php if (is_owner_or_worker($garage)) {
             ?>
             <div class="cta">
