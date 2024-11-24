@@ -99,20 +99,30 @@ function generate_pagination_links(string $total_size): void
     }
 
     $base_url .= $stripped_query;
+    $last_page = floor(((int)$total_size - 1) / $size) + 1;
+    //Keep 5 on screen at all times.
+    //TODO Find a better way to do this?
+    $start_page = max(1, $page - 2);
+
+    $max_page = min($last_page, $start_page + 4);
+    $start_page = min($start_page, $max_page - 4);
 
     echo '<nav aria-label="Page navigation">';
-    echo '    <ul class="pagination justify-content-center">';
-    echo '        <li class="page-item"><a class="page-link" href="' . $base_url . 'page=1">First</a></li>';
+    echo '<ul class="pagination justify-content-center">';
+    $disabled = ($page == 1) ? " disabled" : "";
+    echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=1"><i class="bi bi-chevron-double-left"></i></a></li>';
+    echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . ($page - 1) . '"><i class="bi bi-chevron-left"></i></a></li>';
 
-    $last_page = floor($total_size / $size) + 1;
-    $start_page = max(1, $page - 2);
-    $max_page = min($last_page, $page + 2);
     for ($i = $start_page; $i <= $max_page; $i++) {
         $active = $i == $page ? " active" : "";
         echo '<li class="page-item' . $active . '"><a class="page-link" href="' . $base_url . 'page=' . $i . '">' . $i . '</a></li>';
     }
-    echo '        <li class="page-item"><a class="page-link" href="' . $base_url . 'page=' . $last_page . '">Last</a></li>';
-    echo '    </ul>';
+
+    $disabled = ($page == $last_page) ? " disabled" : "";
+    echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . ($page + 1) . '"><i class="bi bi-chevron-right"></i></a></li>';
+    echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . $last_page . '"><i class="bi bi-chevron-double-right"></i></a></li>';
+    echo '</ul>';
+    echo '<div class="centered">' . ($page - 1) * $size + 1 . '-' . min($page * $size, $total_size) . ' of ' . $total_size . ' results</div>';
     echo '</nav>';
 }
 

@@ -245,7 +245,7 @@ class Database
 
 #region garage
     /** Get all garages
-     * @param array $options
+     * @param array $options visible
      * @return array
      */
     public
@@ -304,7 +304,7 @@ class Database
 
     /** Get all garages that this user has access to
      * @param string $user_id
-     * @param array $options Owner or Worker
+     * @param array $options access Owner or Worker
      * @return array
      * TODO Do this as an option/filter in get_all_garages?
      */
@@ -313,6 +313,7 @@ class Database
     {
         $user_id = $this->escape($user_id);
         $access_query = isset($options['access']) ? "AND access.description='" . $this->escape($options['access']) . "'" : '';
+
         $query = <<<SQL
         SELECT  user_id,
                 garage_id,

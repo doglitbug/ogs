@@ -6,7 +6,6 @@ $id = $_GET['id'] ?? '1';
 
 $item = $db->get_item($id, ["public" => true]);
 if ($item == null || ($item['visible'] == '0' && !can_edit_item($item))) {
-    //TODO Check if garage is hidden
     $_SESSION['error'] = 'Item not found';
     redirect_to(url_for('/item/index.php'));
 }
