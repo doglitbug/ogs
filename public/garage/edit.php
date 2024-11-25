@@ -39,7 +39,7 @@ include(SHARED_PATH . '/public_header.php');
 ?>
 
     <div id="content">
-        <h1><?php echo $page_title; ?></h1>
+        <h1>Edit Garage</h1>
 
         <div class="cta">
             <a class="btn btn-primary action"
@@ -49,7 +49,7 @@ include(SHARED_PATH . '/public_header.php');
 
         <form action="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>" method="post">
             <div class="row">
-                <div class="col-xl-6">
+                <div class="col-xl-4">
                     <label for="name" class="form-label">Name</label>
                     <input type="text" class="form-control" placeholder="Garage name" aria-label="Garage name"
                            name="name"
@@ -58,18 +58,17 @@ include(SHARED_PATH . '/public_header.php');
                         echo '<div class="text-danger">' . $errors['name'] . '</div>';
                     } ?>
                 </div>
-                <div class="col-xl-6">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea type="text" class="form-control" placeholder="Garage description" aria-label="Description"
-                              name="description"
-                              rows="5"><?php echo $garage['description']; ?></textarea>
-                    <?php if (isset($errors['description'])) {
-                        echo '<div class="text-danger">' . $errors['description'] . '</div>';
-                    } ?>
+                <div class="col-xl-4">
+                    <div class="form-check form-switch">
+                        <input type="hidden" name="visible" value="0"/>
+                        <input class="form-check-input" type="checkbox" name="visible" value="1"
+                               id="visible" <?php if ($garage['visible'] == 1) echo "checked"; ?>>
+                        <label class="form-check-label" for="visible">
+                            Visible to public?
+                        </label>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-xl-6">
+                <div class="col-xl-4">
                     <label for="location" class="form-label">Location</label>
                     <select class="form-select" name="location" aria-label="Location">
                         <?php
@@ -86,16 +85,15 @@ include(SHARED_PATH . '/public_header.php');
                         echo '<div class="text-danger">' . $errors['location'] . '</div>';
                     } ?>
                 </div>
-                <div class="col-xl-6">
-                    <div class="form-check form-switch">
-                        <input type="hidden" name="visible" value="0"/>
-                        <input class="form-check-input" type="checkbox" name="visible" value="1"
-                               id="visible" <?php if ($garage['visible'] == 1) echo "checked"; ?>>
-                        <label class="form-check-label" for="visible">
-                            Visible to public?
-                        </label>
-                    </div>
-                </div>
+            </div>
+            <div>
+                <label for="description" class="form-label">Description</label>
+                <textarea type="text" class="form-control" placeholder="Garage description" aria-label="Description"
+                          name="description"
+                          rows="5"><?php echo $garage['description']; ?></textarea>
+                <?php if (isset($errors['description'])) {
+                    echo '<div class="text-danger">' . $errors['description'] . '</div>';
+                } ?>
             </div>
             <div class="row">
                 <div id="operations">

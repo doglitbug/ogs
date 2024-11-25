@@ -25,15 +25,9 @@ include(SHARED_PATH . '/public_header.php');
 
     <div id="content">
         <h1><?php echo $page_title; ?></h1>
-
         <div class="cta">
             <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>"><i
                         class="bi bi-arrow-left"></i>Back</a>
-            <?php if (is_logged_in()) { ?>
-                <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>"><i
-                            class="bi bi-plus-lg"></i>New
-                    Garage</a>
-            <?php } ?>
             <?php if (is_owner($garage['garage_id'])) { ?>
                 <a class="btn btn-warning action"
                    href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>"><i
@@ -48,30 +42,31 @@ include(SHARED_PATH . '/public_header.php');
 
         <div>
             <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Location</th>
-                    <?php if (is_owner_or_worker($garage)) { ?>
-                        <th>Visible to public?</th>
-                    <?php } ?>
-                </tr>
-                </thead>
                 <tbody>
                 <tr>
+                    <th>Name</th>
                     <td><?php echo h($garage['name']); ?></td>
-                    <td><?php echo $garage['description']; ?></td>
+                </tr>
+                <tr>
+                    <th>Location</th>
                     <td><?php echo h($garage['location']); ?></td>
-                    <?php if (is_owner_or_worker($garage)) { ?>
-                        <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
-                    <?php } ?>
+                </tr>
+                <?php if (is_owner_or_worker($garage)) { ?>
+                    <tr>
+                        <th>Visibility</th>
+                        <td><?php echo $garage['visible'] == 1 ? 'Visible to public' : 'Hidden from public'; ?></td>
+                    </tr>
+                <?php } ?>
+                <tr>
+                    <th>Description</th>
+                    <td><?php echo h($garage['description']); ?></td>
                 </tr>
                 </tbody>
             </table>
         </div>
 
-        <h1>Items: <?php echo $max_items ?> found</h1>
+
+        <h1>Items:</h1>
         <?php if (is_owner_or_worker($garage)) {
             ?>
             <div class="cta">

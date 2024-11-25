@@ -100,7 +100,7 @@ include(SHARED_PATH . '/public_header.php');
                 <?php } ?>
                 </tbody>
             </table>
-            <?php generate_pagination_links(100); ?>
+            <?php generate_pagination_links(sizeof($public_garages)); ?>
         </div>
     </div>
 

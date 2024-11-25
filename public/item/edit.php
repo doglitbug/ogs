@@ -19,33 +19,38 @@ if (!can_edit_item($item)) {
 $images = $db->get_item_images($item['item_id']);
 
 if (is_post_request()) {
-    //garage_id pulled from database!
-    $item['name'] = clean_input($_POST['name'], []) ?? '';
-    $item['description'] = clean_input($_POST['description']) ?? '';
-    $item['visible'] = $_POST['visible'] ?? '';
+    //Check to see if POST data was discarded due to overlarge file
+    if (count($_POST) != 0) {
+        //garage_id pulled from database!
+        $item['name'] = clean_input($_POST['name'], []) ?? '';
+        $item['description'] = clean_input($_POST['description']) ?? '';
+        $item['visible'] = $_POST['visible'] ?? '';
 
-    $errors = validate_item($item, $_FILES);
+        $errors = validate_item($item, $_FILES);
 
-    if (empty($errors)) {
-        $db->update_item($item);
-        //Add new images
-        move_and_link_images($_FILES, $item['item_id']);
+        if (empty($errors)) {
+            $db->update_item($item);
+            //Add new images
+            move_and_link_images($_FILES, $item['item_id']);
 
-        //Remove deleted images
-        if (isset($_POST['delete'])) {
-            foreach ($_POST['delete'] as $image_id) {
-                $image = $db->get_image($image_id);
-                //Check it exists and belongs to item (no form tampering!)
-                if (!$image || !in_array($image_id, array_column($images, 'image_id'))) break;
-                //Must delete item_image links first
-                unlink(PUBLIC_PATH . '/images/' . $image['source']);
-                //Remove from images (will cascade to item_image)
-                $db->delete_image($image);
+            //Remove deleted images
+            if (isset($_POST['delete'])) {
+                foreach ($_POST['delete'] as $image_id) {
+                    $image = $db->get_image($image_id);
+                    //Check it exists and belongs to item (no form tampering!)
+                    if (!$image || !in_array($image_id, array_column($images, 'image_id'))) break;
+                    //Must delete item_image links first
+                    unlink(PUBLIC_PATH . '/images/' . $image['source']);
+                    //Remove from images (will cascade to item_image)
+                    $db->delete_image($image);
+                }
             }
-        }
 
-        $_SESSION['message'] = 'Item updated successfully';
-        redirect_to(url_for('/item/show.php?id=' . h(u($item['item_id']))));
+            $_SESSION['message'] = 'Item updated successfully';
+            redirect_to(url_for('/item/show.php?id=' . h(u($item['item_id']))));
+        }
+    } else {
+        $_SESSION['error'] = "File upload too large";
     }
 }
 
@@ -65,7 +70,7 @@ include(SHARED_PATH . '/public_header.php');
         <form action="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>" method="post"
               enctype="multipart/form-data">
             <div class="row">
-                <div class="col-xl-6">
+                <div class="col-xl-4">
                     <label for="name" class="form-label">Name</label>
                     <input type="text" class="form-control" placeholder="Item name" aria-label="Item name" name="name"
                            value="<?php echo h($item['name']); ?>">
@@ -73,18 +78,7 @@ include(SHARED_PATH . '/public_header.php');
                         echo '<div class="text-danger">' . $errors['name'] . '</div>';
                     } ?>
                 </div>
-                <div class="col-xl-6">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" placeholder="Item description" aria-label="Description"
-                              name="description"
-                              rows="5"><?php echo $item['description']; ?></textarea>
-                    <?php if (isset($errors['description'])) {
-                        echo '<div class="text-danger">' . $errors['description'] . '</div>';
-                    } ?>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xl-12">
+                <div class="col-xl-4">
                     <div class="form-check form-switch">
                         <input type="hidden" name="visible" value="0"/>
                         <input class="form-check-input" type="checkbox" name="visible" value="1"
@@ -95,6 +89,17 @@ include(SHARED_PATH . '/public_header.php');
                     </div>
                 </div>
             </div>
+
+            <div>
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" placeholder="Item description" aria-label="Description"
+                          name="description"
+                          rows="5"><?php echo $item['description']; ?></textarea>
+                <?php if (isset($errors['description'])) {
+                    echo '<div class="text-danger">' . $errors['description'] . '</div>';
+                } ?>
+            </div>
+
             <div class="row">
                 <h3>Images:</h3>
                 <?php foreach ($images as $image) {

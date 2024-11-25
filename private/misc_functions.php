@@ -81,16 +81,15 @@ function move_and_link_images(array $images, int $item_id): void
  */
 function generate_pagination_links(string $total_size): void
 {
-    list ($page, $size) = get_page_and_size();
+    list ($current_page, $size) = get_page_and_size();
 
     $base_url = $_SERVER['PHP_SELF'];
     $stripped_query = '?';
-    //Strip out the page and size params, but keep all others, eg search
+    //Strip out the page params, but keep all others, eg search and size!
     if (!empty($_SERVER['QUERY_STRING'])) {
         $parsed = parse_url($base_url . '?' . $_SERVER['QUERY_STRING']);
         $query = $parsed['query'];
         parse_str($query, $params);
-        unset($params['size']);
         unset($params['page']);
 
         if ($params) {
@@ -100,29 +99,26 @@ function generate_pagination_links(string $total_size): void
 
     $base_url .= $stripped_query;
     $last_page = floor(((int)$total_size - 1) / $size) + 1;
-    //Keep 5 on screen at all times.
-    //TODO Find a better way to do this?
-    $start_page = max(1, $page - 2);
-
-    $max_page = min($last_page, $start_page + 4);
-    $start_page = min($start_page, $max_page - 4);
+    //Keep 5 on screen at all times
+    $start_page = max(1, min($current_page - 2, $last_page - 4));
+    $end_page = min($start_page + 4, $last_page);
 
     echo '<nav aria-label="Page navigation">';
     echo '<ul class="pagination justify-content-center">';
-    $disabled = ($page == 1) ? " disabled" : "";
+    $disabled = ($current_page == 1) ? " disabled" : "";
     echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=1"><i class="bi bi-chevron-double-left"></i></a></li>';
-    echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . ($page - 1) . '"><i class="bi bi-chevron-left"></i></a></li>';
+    echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . ($current_page - 1) . '"><i class="bi bi-chevron-left"></i></a></li>';
 
-    for ($i = $start_page; $i <= $max_page; $i++) {
-        $active = $i == $page ? " active" : "";
+    for ($i = $start_page; $i <= $end_page; $i++) {
+        $active = $i == $current_page ? " active" : "";
         echo '<li class="page-item' . $active . '"><a class="page-link" href="' . $base_url . 'page=' . $i . '">' . $i . '</a></li>';
     }
 
-    $disabled = ($page == $last_page) ? " disabled" : "";
-    echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . ($page + 1) . '"><i class="bi bi-chevron-right"></i></a></li>';
+    $disabled = ($current_page == $last_page) ? " disabled" : "";
+    echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . ($current_page + 1) . '"><i class="bi bi-chevron-right"></i></a></li>';
     echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . $last_page . '"><i class="bi bi-chevron-double-right"></i></a></li>';
     echo '</ul>';
-    echo '<div class="centered">' . ($page - 1) * $size + 1 . '-' . min($page * $size, $total_size) . ' of ' . $total_size . ' results</div>';
+    echo '<div class="centered">' . ($current_page - 1) * $size + 1 . '-' . min($current_page * $size, $total_size) . ' of ' . $total_size . ' results</div>';
     echo '</nav>';
 }
 
@@ -131,8 +127,8 @@ function generate_pagination_links(string $total_size): void
  */
 function get_page_and_size(): array
 {
-    $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
-    $size = isset($_GET['size']) && is_numeric($_GET['size']) && $_GET['size'] > 0 ? (int)$_GET['size'] : 5;
+    $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 && $_GET['page'] < 1000 ? (int)$_GET['page'] : 1;
+    $size = isset($_GET['size']) && is_numeric($_GET['size']) && $_GET['size'] > 0 && $_GET['size'] < 1000 ? (int)$_GET['size'] : 10;
     return [$page, $size];
 }
 

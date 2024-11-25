@@ -23,9 +23,6 @@ include(SHARED_PATH . '/public_header.php');
             <a class="btn btn-primary action"
                href="<?php echo url_for('/garage/show.php?id=' . h(u($item['garage_id']))); ?>"><i class="bi bi-arrow-left"></i>Back</a>
             <?php if (can_edit_item($item)) { ?>
-
-                <a class="btn btn-success action"
-                   href="<?php echo url_for('/item/create.php?garage_id=' . h(u($item['garage_id']))); ?>"><i class="bi bi-plus-lg"></i>Add Item</a>
                 <a class="btn btn-warning action"
                    href="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>"><i class="bi bi-pencil"></i>Edit Item</a>
                 <a class="btn btn-danger action"
@@ -35,22 +32,20 @@ include(SHARED_PATH . '/public_header.php');
 
         <div>
             <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <?php if (can_edit_item($item)) { ?>
-                        <th>Visible to public?</th>
-                    <?php } ?>
-                </tr>
-                </thead>
                 <tbody>
                 <tr>
+                    <th>Name</th>
                     <td><?php echo h($item['name']); ?></td>
-                    <td><?php echo $item['description']; ?></td>
-                    <?php if (can_edit_item($item)) { ?>
-                        <td><?php echo $item['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
-                    <?php } ?>
+                </tr>
+                <?php if (is_owner_or_worker($item)) { ?>
+                    <tr>
+                        <th>Visibility</th>
+                        <td><?php echo $item['visible'] == 1 ? 'Visible to public' : 'Hidden from public'; ?></td>
+                    </tr>
+                <?php } ?>
+                <tr>
+                    <th>Description</th>
+                    <td><?php echo h($item['description']); ?></td>
                 </tr>
                 </tbody>
             </table>

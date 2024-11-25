@@ -42,11 +42,11 @@ function h(?string $string = ""): string
 }
 
 /** Attempt to clean up user input
- * @param string $input
+ * @param string|null $input
  * @param array $allowed_tags defaults to b, i
  * @return string
  */
-function clean_input(string $input, array $allowed_tags = ['b', 'i']): string
+function clean_input(string|null $input = "", array $allowed_tags = ['b', 'i']): string
 {
     global $db;
     return $db->escape(trim(strip_tags($input, $allowed_tags)));
