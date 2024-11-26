@@ -6,7 +6,7 @@ if (is_logged_in()) {
     if (is_admin($_SESSION['user_id']) || is_super_admin($_SESSION['user_id'])) {
         $sections['Staff'] = url_for("staff");
     }
-    $sections['Profile'] = url_for('auth/profile.php');
+    $sections['Profile'] = url_for('user/show.php');
     $sections['Log out'] = url_for('auth/logout.php');
 } else {
     $sections['Log in'] = url_for("auth/login.php");
@@ -47,8 +47,8 @@ $current = basename(dirname($_SERVER['PHP_SELF']));
                 ?>
             </ul>
 
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <form action="<?php echo url_for('/item/index.php'); ?>" class="d-flex" role="search" method="get">
+                <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
         </div>

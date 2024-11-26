@@ -17,6 +17,16 @@ function print_and_delete(string $name, string $type = "primary"): void
     unset($_SESSION[$name]);
 }
 
+/** Output validation errors onto forms if avaliable
+ * @param string $name
+ * @return void
+ */
+function validation(string $name):void{
+    if (isset($errors[$name])) {
+        echo '<div class="text-danger">' . $errors[$name] . '</div>';
+    }
+}
+
 /** Debug.print a variable
  * @param mixed $variable Variable to print out
  * @return void
@@ -98,8 +108,9 @@ function generate_pagination_links(string $total_size): void
     }
 
     $base_url .= $stripped_query;
-    $last_page = floor(((int)$total_size - 1) / $size) + 1;
-    //Keep 5 on screen at all times
+    //Adjust for no results found
+    $last_page = max(floor(((int)$total_size - 1) / $size) + 1, 1);
+    //Keep 5 on screen at all times when possible
     $start_page = max(1, min($current_page - 2, $last_page - 4));
     $end_page = min($start_page + 4, $last_page);
 
@@ -118,7 +129,12 @@ function generate_pagination_links(string $total_size): void
     echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . ($current_page + 1) . '"><i class="bi bi-chevron-right"></i></a></li>';
     echo '<li class="page-item' . $disabled . '"><a class="page-link" href="' . $base_url . 'page=' . $last_page . '"><i class="bi bi-chevron-double-right"></i></a></li>';
     echo '</ul>';
-    echo '<div class="centered">' . ($current_page - 1) * $size + 1 . '-' . min($current_page * $size, $total_size) . ' of ' . $total_size . ' results</div>';
+    echo '<div class="centered">';
+    if ($total_size != 0) {
+        echo ($current_page - 1) * $size + 1 . '-' . min($current_page * $size, $total_size) . ' of ' . $total_size . ' results';
+    } else {
+        echo 'No results found';
+    }
     echo '</nav>';
 }
 

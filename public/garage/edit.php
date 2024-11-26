@@ -28,7 +28,7 @@ if (is_post_request()) {
     if (empty($errors)) {
         $db->update_garage($garage);
         $_SESSION['message'] = 'Garage updated successfully';
-        redirect_to(url_for('/garage/show.php?id=' . $garage['garage_id']));
+        redirect_to(url_for('/garage/show.php?id=' . h(u($garage['garage_id']))));
     }
 }
 

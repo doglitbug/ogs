@@ -134,6 +134,7 @@ class Database
                 username,
                 name,
                 email,
+                user.description,
                 location.description as location,
                 IFNULL(admin.description, 'User') as access,
                 user.created_at,
@@ -158,6 +159,8 @@ class Database
                 username,
                 name,
                 email,
+                user.description,
+                location_id,
                 location.description as location,
                 IFNULL(admin.description, 'User') as access,
                 user.created_at,
@@ -170,7 +173,12 @@ class Database
         LIMIT 1
         SQL;
 
-        return $this->get_query($query);
+        $result = $this->get_query($query);
+        if ($result) {
+            return $result[0];
+        } else {
+            return [];
+        }
     }
 
     /** Get user by email address
@@ -205,6 +213,31 @@ class Database
         }
     }
 
+    /** Update an existing user
+     * @param array $user
+     * @return void
+     */
+    public function update_user(array $user): void
+    {
+        $user_id = $this->escape($user['user_id']);
+        $name = $this->escape($user['name']);
+        $username = $this->escape($user['username']);
+        $location_id = $this->escape($user['location_id']);
+        $description = $this->escape($user['description']);
+
+        $query = <<<SQL
+        UPDATE user SET name = '$name',
+                        username = '$username',
+                        description = '$description',
+                        location_id = '$location_id'
+        WHERE user_id = '$user_id'
+        LIMIT 1
+        SQL;
+
+        dump($query);
+        $this->update_query($query);
+    }
+
     /** Check to see if there is a user in the database with this email
      * @param string $email
      * @return bool
@@ -234,11 +267,7 @@ class Database
         SQL;
 
         $result = $this->get_query($query);
-        if ($result) {
-            return $result[0]['access'];
-        } else {
-            return "";
-        }
+        return $result[0]['access'];
     }
 
 #endregion
@@ -360,7 +389,7 @@ class Database
         return $this->insert_query($query);
     }
 
-    /** Update and existing garage
+    /** Update an existing garage
      * @param array $garage
      * @return void
      */
@@ -461,7 +490,7 @@ class Database
             }
         }
 
-        if(isset($options['paginate'])) {
+        if (isset($options['paginate'])) {
             $query .= $this->generate_pagination_sql();
         }
 

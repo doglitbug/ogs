@@ -51,18 +51,14 @@ include(SHARED_PATH . '/public_header.php');
                     <input type="text" class="form-control" placeholder="Garage name" aria-label="Garage name"
                            name="name"
                            value="<?php echo h($garage['name']); ?>">
-                    <?php if (isset($errors['name'])) {
-                        echo '<div class="text-danger">' . $errors['name'] . '</div>';
-                    } ?>
+                    <?php validation('name'); ?>
                 </div>
                 <div class="col-xl-6">
                     <label for="description" class="form-label">Description</label>
                     <textarea class="form-control" placeholder="Garage description" aria-label="Description"
                               name="description"
                               rows="5"><?php echo $garage['description']; ?></textarea>
-                    <?php if (isset($errors['description'])) {
-                        echo '<div class="text-danger">' . $errors['description'] . '</div>';
-                    } ?>
+                    <?php validation('description'); ?>
                 </div>
             </div>
             <div class="row">

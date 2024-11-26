@@ -29,7 +29,7 @@ if (is_post_request()) {
         move_and_link_images($_FILES, $item_id);
 
         $_SESSION['message'] = 'Item created successfully';
-        redirect_to(url_for('/item/show.php?id=' . $item_id));
+        redirect_to(url_for('/item/show.php?id=' . h(u($item_id))));
     }
 } else {
     $item['name'] = '';

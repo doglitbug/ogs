@@ -110,6 +110,41 @@ function has_valid_email(string $value): bool
 #endregion
 
 #region validation
+function validate_user(array $user): array
+{
+    global $db;
+    $errors = [];
+
+    #name
+    if (is_blank($user['name'])) {
+        $errors['name'] = "Name cannot be blank";
+    } else if (!has_length($user['name'], ['min' => 2, 'max' => 255])) {
+        $errors['name'] = "Name must be between 2 and 255 characters";
+    }
+
+    #name
+    if (is_blank($user['username'])) {
+        $errors['username'] = "Username cannot be blank";
+    } else if (!has_length($user['username'], ['min' => 2, 'max' => 255])) {
+        $errors['username'] = "Username must be between 2 and 255 characters";
+    }
+
+    #location
+    $location_str = (string)$user['location_id'];
+    $locations = array_column($db->get_all_locations(), 'location_id');
+
+    if (!has_inclusion_of($location_str, $locations)) {
+        $errors['location_id'] = "Location must be one of the provided options";
+    }
+
+    #description
+    if (has_length_greater_than($user['description'], 2048)) {
+        $errors['description'] = "Description must be less than 2048 characters";
+    }
+
+    return $errors;
+}
+
 function validate_garage(array $garage): array
 {
     global $db;
@@ -157,7 +192,7 @@ function validate_item(array $item, $files): array
     }
 
     #description
-    if (has_length_greater_than($item['description'],2048)) {
+    if (has_length_greater_than($item['description'], 2048)) {
         $errors['description'] = "Description must be less than 2048 characters";
     }
 

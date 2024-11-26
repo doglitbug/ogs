@@ -102,3 +102,11 @@ function is_get_request(): bool
     return $_SERVER['REQUEST_METHOD'] == 'GET';
 }
 
+function get_parameter(string $name, array $options = []): string
+{
+    if (isset($_POST[$name])) return $_POST[$name];
+    if (isset($_GET[$name])) return $_GET[$name];
+    //TODO Clean up here?
+    return "";
+}
+

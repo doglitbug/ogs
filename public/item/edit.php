@@ -63,8 +63,8 @@ include(SHARED_PATH . '/public_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><i
-                        class="bi bi-arrow-left"></i>Back</a>
+               href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>">
+                <i class="bi bi-arrow-left"></i>Back</a>
         </div>
 
         <form action="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>" method="post"
@@ -74,9 +74,7 @@ include(SHARED_PATH . '/public_header.php');
                     <label for="name" class="form-label">Name</label>
                     <input type="text" class="form-control" placeholder="Item name" aria-label="Item name" name="name"
                            value="<?php echo h($item['name']); ?>">
-                    <?php if (isset($errors['name'])) {
-                        echo '<div class="text-danger">' . $errors['name'] . '</div>';
-                    } ?>
+                    <?php validation('name'); ?>
                 </div>
                 <div class="col-xl-4">
                     <div class="form-check form-switch">
@@ -95,9 +93,7 @@ include(SHARED_PATH . '/public_header.php');
                 <textarea class="form-control" placeholder="Item description" aria-label="Description"
                           name="description"
                           rows="5"><?php echo $item['description']; ?></textarea>
-                <?php if (isset($errors['description'])) {
-                    echo '<div class="text-danger">' . $errors['description'] . '</div>';
-                } ?>
+                <?php validation('description'); ?>
             </div>
 
             <div class="row">
@@ -130,9 +126,7 @@ include(SHARED_PATH . '/public_header.php');
                 <div class="col-xl-6">
                     <label for="images" class="form-label">Add image</label>
                     <input type="file" id="images" name="images">
-                    <?php if (isset($errors['images'])) {
-                        echo '<div class="text-danger">' . $errors['images'] . '</div>';
-                    } ?>
+                    <?php validation('images'); ?>
                 </div>
             </div>
             <div class="row">

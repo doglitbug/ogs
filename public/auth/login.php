@@ -10,7 +10,7 @@ if (is_post_request()) {
     $_SESSION['email'] = $_POST['email'];
     $_SESSION['logon_method'] = "Impersonation";
     log_in();
-    redirect_to(url_for('auth/profile.php'));
+    redirect_to(url_for('user/show.php'));
 }
 
 $users = $db->get_all_users();
@@ -38,7 +38,6 @@ include(SHARED_PATH . '/public_header.php');
             </div>
             <br/>
             <br/>
-            <br/>
             <div class="centered">
                 <h1>Impersonation</h1>
                 <form action="<?php echo url_for('/auth/login.php'); ?>" method="post">
@@ -51,7 +50,6 @@ include(SHARED_PATH . '/public_header.php');
                     </select>
                     <button type="submit" class="btn btn-secondary">Impersonate</button>
                 </form>
-
             </div>
         <?php } ?>
     </div>

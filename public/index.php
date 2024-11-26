@@ -13,6 +13,12 @@ include(SHARED_PATH . '/public_header.php');
 
     <a class="btn btn-primary action"
        href="<?php echo url_for('/item/index.php'); ?>">Items</a>
+
+    <?php if (is_logged_in()) {?>
+        <a class="btn btn-primary action"
+           href="<?php echo url_for('/user/show.php'); ?>">User Details</a>
+
+    <?php } ?>
 </div>
 <p>Welcome to the Online Garage Sale, an idea born of necessity and disappointment!</p>
 
