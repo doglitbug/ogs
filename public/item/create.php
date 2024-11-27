@@ -4,8 +4,10 @@ require_once('../../private/initialize.php');
 require_login();
 
 $item = [];
+$errors = [];
 $id = $_GET['garage_id'] ?? '0';
 
+//TODO Allow null garage and have a drop down to change garage!
 $garage = $db->get_garage($id);
 if ($garage == null) {
     $_SESSION['error'] = 'Garage not found';
@@ -24,6 +26,7 @@ if (is_post_request()) {
     $item['visible'] = $_POST['visible'] ?? '';
 
     $errors = validate_item($item, $_FILES);
+
     if (empty($errors)) {
         $item_id = $db->insert_item($item);
         move_and_link_images($_FILES, $item_id);
@@ -37,7 +40,7 @@ if (is_post_request()) {
     $item['visible'] = '1';
 }
 
-$page_title = 'Add item';
+$page_title = 'Add Item';
 include(SHARED_PATH . '/public_header.php');
 ?>
 
@@ -50,53 +53,44 @@ include(SHARED_PATH . '/public_header.php');
                         class="bi bi-arrow-left"></i>Back</a>
         </div>
 
-        <form action="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>" method="post"
+        <form class="row g-3"
+              action="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>" method="post"
               enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-xl-6">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" placeholder="Item name" aria-label="Item name" name="name"
-                           value="<?php echo h($item['name']); ?>">
-                    <?php if (isset($errors['name'])) {
-                        echo '<div class="text-danger">' . $errors['name'] . '</div>';
-                    } ?>
-                </div>
-                <div class="col-xl-6">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" placeholder="Item description" aria-label="Description"
-                              name="description"
-                              rows="5"><?php echo $item['description']; ?></textarea>
-                    <?php if (isset($errors['description'])) {
-                        echo '<div class="text-danger">' . $errors['description'] . '</div>';
-                    } ?>
+            <div class="col-md-6">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" placeholder="Item name" aria-label="Item name" name="name"
+                       value="<?php echo h($item['name']); ?>">
+                <?php validation('name'); ?>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input type="hidden" name="visible" value="0"/>
+                    <input class="form-check-input" type="checkbox" name="visible" value="1"
+                           id="visible" <?php if ($item['visible'] == 1) echo "checked"; ?>>
+                    <label class="form-check-label" for="visible">
+                        Visible to public?
+                    </label>
+                    <?php validation('visible'); ?>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-xl-12">
-                    <div class="form-check form-switch">
-                        <input type="hidden" name="visible" value="0"/>
-                        <input class="form-check-input" type="checkbox" name="visible" value="1"
-                               id="visible" <?php if ($item['visible'] == 1) echo "checked"; ?>>
-                        <label class="form-check-label" for="visible">
-                            Visible to public?
-                        </label>
-                    </div>
-                </div>
+
+            <div class="col-12">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" placeholder="Item description" aria-label="Description"
+                          name="description"
+                          rows="5"><?php echo $item['description']; ?></textarea>
+                <?php validation('description'); ?>
             </div>
-            <div class="row">
-                <h3>Images</h3>
-                <div class="col-xl-6">
-                    <label for="images" class="form-label">Add image</label>
-                    <input type="file" id="images" name="images">
-                    <?php if (isset($errors['images'])) {
-                        echo '<div class="text-danger">' . $errors['images'] . '</div>';
-                    } ?>
-                </div>
+
+
+            <h3>Add Image:</h3>
+            <div class="col-12">
+                <input type="file" id="images" name="images">
+                <?php validation('images'); ?>
             </div>
-            <div class="row">
-                <div id="operations">
-                    <button type="submit" class="btn btn-warning">Add Item</button>
-                </div>
+
+            <div class="col-12" id="operations">
+                <button type="submit" class="btn btn-warning">Add Item</button>
             </div>
         </form>
     </div>

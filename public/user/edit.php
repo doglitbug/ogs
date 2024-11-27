@@ -20,8 +20,6 @@ if (is_post_request()) {
 
     $errors = validate_user($user);
 
-    dump($errors);
-
     if (empty($errors)) {
         $db->update_user($user);
         $_SESSION['message'] = 'User updated successfully';

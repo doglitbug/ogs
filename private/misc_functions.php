@@ -17,11 +17,13 @@ function print_and_delete(string $name, string $type = "primary"): void
     unset($_SESSION[$name]);
 }
 
-/** Output validation errors onto forms if avaliable
+/** Output validation errors onto forms if available
  * @param string $name
  * @return void
  */
-function validation(string $name):void{
+function validation(string $name): void
+{
+    global $errors;
     if (isset($errors[$name])) {
         echo '<div class="text-danger">' . $errors[$name] . '</div>';
     }

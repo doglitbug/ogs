@@ -47,58 +47,52 @@ include(SHARED_PATH . '/public_header.php');
                         class="bi bi-arrow-left"></i>Back</a>
         </div>
 
-        <form action="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>" method="post">
-            <div class="row">
-                <div class="col-xl-4">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" placeholder="Garage name" aria-label="Garage name"
-                           name="name"
-                           value="<?php echo h($garage['name']); ?>">
-                    <?php if (isset($errors['name'])) {
-                        echo '<div class="text-danger">' . $errors['name'] . '</div>';
-                    } ?>
-                </div>
-                <div class="col-xl-4">
-                    <div class="form-check form-switch">
-                        <input type="hidden" name="visible" value="0"/>
-                        <input class="form-check-input" type="checkbox" name="visible" value="1"
-                               id="visible" <?php if ($garage['visible'] == 1) echo "checked"; ?>>
-                        <label class="form-check-label" for="visible">
-                            Visible to public?
-                        </label>
-                    </div>
-                </div>
-                <div class="col-xl-4">
-                    <label for="location" class="form-label">Location</label>
-                    <select class="form-select" name="location" aria-label="Location">
-                        <?php
-                        foreach ($locations as $location) {
-                            echo "<option value=\"{$location['location_id']}\"";
-                            if ($garage['location_id'] == $location['location_id']) {
-                                echo " selected";
-                            }
-                            echo ">{$location['description']}</option>";
-                        }
-                        ?>
-                    </select>
-                    <?php if (isset($errors['location'])) {
-                        echo '<div class="text-danger">' . $errors['location'] . '</div>';
-                    } ?>
-                </div>
+        <form class="row g-3" action="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>"
+              method="post">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" placeholder="Garage name" aria-label="Garage name"
+                       name="name"
+                       value="<?php echo h($garage['name']); ?>">
+                <?php validation('name'); ?>
             </div>
-            <div>
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input type="hidden" name="visible" value="0"/>
+                    <input class="form-check-input" type="checkbox" name="visible" value="1"
+                           id="visible" <?php if ($garage['visible'] == 1) echo "checked"; ?>>
+                    <label class="form-check-label" for="visible">
+                        Visible to public?
+                    </label>
+                </div>
+                <?php validation('visible'); ?>
+            </div>
+            <div class="col-md-6">
+                <label for="location" class="form-label">Location</label>
+                <select class="form-select" name="location" aria-label="Location">
+                    <?php
+                    foreach ($locations as $location) {
+                        echo "<option value=\"{$location['location_id']}\"";
+                        if ($garage['location_id'] == $location['location_id']) {
+                            echo " selected";
+                        }
+                        echo ">{$location['description']}</option>";
+                    }
+                    ?>
+                </select>
+                <?php validation('location'); ?>
+            </div>
+
+            <div class="col-12">
                 <label for="description" class="form-label">Description</label>
                 <textarea type="text" class="form-control" placeholder="Garage description" aria-label="Description"
                           name="description"
                           rows="5"><?php echo $garage['description']; ?></textarea>
-                <?php if (isset($errors['description'])) {
-                    echo '<div class="text-danger">' . $errors['description'] . '</div>';
-                } ?>
+                <?php validation('description'); ?>
             </div>
-            <div class="row">
-                <div id="operations">
-                    <button type="submit" class="btn btn-warning">Edit Garage</button>
-                </div>
+
+            <div class="col-12" id="operations">
+                <button type="submit" class="btn btn-warning">Edit Garage</button>
             </div>
         </form>
     </div>
