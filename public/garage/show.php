@@ -19,6 +19,8 @@ $max_items = sizeof($db->get_items($options));
 $options['paginate'] = 'true';
 $shown_items = $db->get_items($options);
 
+$garage_staff = $db->get_garage_staff($garage['garage_id']);
+
 $page_title = 'Show Garage: ' . h($garage['name']);
 include(SHARED_PATH . '/public_header.php');
 ?>
@@ -40,29 +42,46 @@ include(SHARED_PATH . '/public_header.php');
             <?php } ?>
         </div>
 
-        <div>
-            <table class="table table-hover">
-                <tbody>
-                <tr>
-                    <th>Name</th>
-                    <td><?php echo h($garage['name']); ?></td>
-                </tr>
-                <tr>
-                    <th>Location</th>
-                    <td><?php echo h($garage['location']); ?></td>
-                </tr>
-                <?php if (is_owner_or_worker($garage)) { ?>
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Details:</h2>
+                <table class="table table-hover">
+                    <tbody>
                     <tr>
-                        <th>Visibility</th>
-                        <td><?php echo $garage['visible'] == 1 ? 'Visible to public' : 'Hidden from public'; ?></td>
+                        <th>Name</th>
+                        <td><?php echo h($garage['name']); ?></td>
                     </tr>
-                <?php } ?>
-                <tr>
-                    <th>Description</th>
-                    <td><?php echo h($garage['description']); ?></td>
-                </tr>
-                </tbody>
-            </table>
+                    <tr>
+                        <th>Location</th>
+                        <td><?php echo h($garage['location']); ?></td>
+                    </tr>
+                    <?php if (is_owner_or_worker($garage)) { ?>
+                        <tr>
+                            <th>Visibility</th>
+                            <td><?php echo $garage['visible'] == 1 ? 'Visible to public' : 'Hidden from public'; ?></td>
+                        </tr>
+                    <?php } ?>
+                    <tr>
+                        <th>Description</th>
+                        <td><?php echo h($garage['description']); ?></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h2>Contact:</h2>
+                <table class="table table-hover">
+                    <?php if (is_logged_in()) {
+                        foreach ($garage_staff as $gsm) {
+                            echo '<tr><th>' . $gsm['description'] . '</th>';
+                            echo '<td><a href="' . url_for("/user/show.php?id=" . h(u($gsm['user_id']))) . '">' . h(u($gsm['username'])) . '</a>';
+                            echo '</td></tr>';
+                        }
+                    } else {
+                        echo '<tr><td>This is only available to registered users.<br/>Please click <a href="' . url_for("auth/login.php") . '">here</a> to sign in or sign up</td></tr>';
+                    } ?>
+                </table>
+            </div>
         </div>
 
 

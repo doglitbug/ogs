@@ -337,8 +337,7 @@ class Database
      * @return array
      * TODO Do this as an option/filter in get_all_garages?
      */
-    public
-    function get_garages_by_user(string $user_id, array $options = []): array
+    public function get_garages_by_user(string $user_id, array $options = []): array
     {
         $user_id = $this->escape($user_id);
         $access_query = isset($options['access']) ? "AND access.description='" . $this->escape($options['access']) . "'" : '';
@@ -358,6 +357,28 @@ class Database
         WHERE user_id = '$user_id'
             {$access_query}
         ORDER BY access 
+        SQL;
+
+        return $this->get_query($query);
+    }
+
+    /** Get a list of owners, then workers for this garage
+     * @param string $garage_id
+     * @return array
+     */
+    public function get_garage_staff(string $garage_id): array
+    {
+        $garage_id = $this->escape($garage_id);
+
+        $query = <<<SQL
+        SELECT  user_id,
+                username,
+                access.description
+        FROM user_garage_access
+            LEFT JOIN user USING (user_id)
+            LEFT JOIN access using (access_id)
+        WHERE garage_id = '{$garage_id}'
+        ORDER BY access.access_id
         SQL;
 
         return $this->get_query($query);
