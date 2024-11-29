@@ -40,7 +40,7 @@ include(SHARED_PATH . '/public_header.php');
                             <td><a class="action"
                                    href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>">
                                     <?php echo h($garage['name']); ?></a></td>
-                            <td><?php echo $garage['description']; ?></td>
+                            <td><?php echo nl2br(stripcslashes($garage['description'])); ?></td>
                             <td><?php echo h($garage['location']); ?></td>
                             <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                         </tr>
@@ -68,7 +68,7 @@ include(SHARED_PATH . '/public_header.php');
                             <td><a class="action"
                                    href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>">
                                     <?php echo h($garage['name']); ?></a></td>
-                            <td><?php echo $garage['description']; ?></td>
+                            <td><?php echo nl2br(stripcslashes(($garage['description']))); ?></td>
                             <td><?php echo h($garage['location']); ?></td>
                             <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                         </tr>
@@ -94,7 +94,7 @@ include(SHARED_PATH . '/public_header.php');
                         <td><a class="action"
                                href="<?php echo url_for('/garage/show.php?id=' . h(u($garage['garage_id']))); ?>">
                                 <?php echo h($garage['name']); ?></a></td>
-                        <td><?php echo $garage['description']; ?></td>
+                        <td><?php echo nl2br(stripcslashes(($garage['description']))); ?></td>
                         <td><?php echo h($garage['location']); ?></td>
                     </tr>
                 <?php } ?>

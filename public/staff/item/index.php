@@ -26,7 +26,7 @@ include(SHARED_PATH . '/staff_header.php');
                 <tr>
                     <td><?php echo h($item['item_id']); ?></a></td>
                     <td><?php echo h($item['name']); ?></a></td>
-                    <td><?php echo h($item['description']); ?></a></td>
+                    <td><?php echo nl2br(stripcslashes($item['description'])); ?></a></td>
                     <td><?php echo h($item['created_at']); ?></a></td>
                     <td><?php echo h($item['updated_at']); ?></a></td>
                     <td><a class="action"

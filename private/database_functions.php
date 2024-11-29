@@ -373,7 +373,7 @@ class Database
         $query = <<<SQL
         SELECT  user_id,
                 username,
-                access.description
+                access.description as access
         FROM user_garage_access
             LEFT JOIN user USING (user_id)
             LEFT JOIN access using (access_id)

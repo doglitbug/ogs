@@ -44,7 +44,7 @@ include(SHARED_PATH . '/public_header.php');
                     <td>
                         <a href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><?php echo h($item['name']); ?></a>
                     </td>
-                    <td><?php echo $item['description']; ?></td>
+                    <td><?php echo nl2br(stripcslashes($item['description'])); ?></td>
                 </tr>
             <?php } ?>
             </tbody>

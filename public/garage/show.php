@@ -63,7 +63,7 @@ include(SHARED_PATH . '/public_header.php');
                     <?php } ?>
                     <tr>
                         <th>Description</th>
-                        <td><?php echo h($garage['description']); ?></td>
+                        <td><?php echo nl2br(stripcslashes($garage['description'])); ?></td>
                     </tr>
                     </tbody>
                 </table>
@@ -73,12 +73,12 @@ include(SHARED_PATH . '/public_header.php');
                 <table class="table table-hover">
                     <?php if (is_logged_in()) {
                         foreach ($garage_staff as $gsm) {
-                            echo '<tr><th>' . $gsm['description'] . '</th>';
+                            echo '<tr><th>' . $gsm['access'] . '</th>';
                             echo '<td><a href="' . url_for("/user/show.php?id=" . h(u($gsm['user_id']))) . '">' . h(u($gsm['username'])) . '</a>';
                             echo '</td></tr>';
                         }
                     } else {
-                        echo '<tr><td>This is only available to registered users.<br/>Please click <a href="' . url_for("auth/login.php") . '">here</a> to sign in or sign up</td></tr>';
+                        echo '<tr><td>This is only available to registered users.<br/>Please click <a href="' . url_for("auth/login.php") . '">here</a> to log in or sign up</td></tr>';
                     } ?>
                 </table>
             </div>
@@ -127,7 +127,7 @@ include(SHARED_PATH . '/public_header.php');
                         <td>
                             <a href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><?php echo h($item['name']); ?></a>
                         </td>
-                        <td><?php echo $item['description']; ?></td>
+                        <td><?php echo nl2br(stripcslashes($item['description'])); ?></td>
                         <?php if (is_owner_or_worker($garage)) { ?>
                             <td><?php echo $item['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                         <?php } ?>

@@ -45,7 +45,7 @@ include(SHARED_PATH . '/public_header.php');
                 <?php } ?>
                 <tr>
                     <th>Description</th>
-                    <td><?php echo h($item['description']); ?></td>
+                    <td><?php echo nl2br(stripcslashes($item['description'])); ?></td>
                 </tr>
                 </tbody>
             </table>

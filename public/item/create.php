@@ -78,7 +78,7 @@ include(SHARED_PATH . '/public_header.php');
                 <label for="description" class="form-label">Description</label>
                 <textarea class="form-control" placeholder="Item description" aria-label="Description"
                           name="description"
-                          rows="5"><?php echo $item['description']; ?></textarea>
+                          rows="5"><?php echo stripcslashes($item['description']); ?></textarea>
                 <?php validation('description'); ?>
             </div>
 

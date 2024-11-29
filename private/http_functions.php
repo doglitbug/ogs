@@ -14,7 +14,7 @@ function url_for(string $script_path): string
     return WWW_ROOT . $script_path;
 }
 
-/** Apply urlencode to provided value
+/** Apply urlencode to provided value. Used when text is to be part of a URL
  * @param string|null $string input
  * @return string output
  */
@@ -32,7 +32,7 @@ function raw_u(?string $string = ""): string
     return rawurlencode($string);
 }
 
-/** Apply htmlspecialchars to provided value
+/** Apply htmlspecialchars to provided value. Used to convert special characters to html equivx
  * @param string|null $string input
  * @return string
  */

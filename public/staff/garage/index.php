@@ -28,9 +28,8 @@ include(SHARED_PATH . '/staff_header.php');
                 <tr>
                     <td><?php echo h($garage['garage_id']); ?></a></td>
                     <td><?php echo h($garage['name']); ?></a></td>
-                    <td><?php echo h($garage['description']); ?></td>
+                    <td><?php echo nl2br(stripcslashes($garage['description'])); ?></td>
                     <td><?php echo h($garage['location']); ?></td>
-                    <td><?php echo $garage['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                     <td><?php echo h($garage['created_at']); ?></a></td>
                     <td><?php echo h($garage['updated_at']); ?></a></td>
 
