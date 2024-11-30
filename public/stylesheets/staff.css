@@ -1,0 +1,17 @@
+body {
+    background-color: lightblue;
+}
+
+.container {
+    padding-top: 10px;
+}
+
+nav.navbar {
+    background-color: indianred;
+}
+
+.centered {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}

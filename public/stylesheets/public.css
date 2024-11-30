@@ -1,0 +1,61 @@
+body {
+    background-color: lightblue ;
+}
+
+.container {
+    padding-top: 10px;
+}
+
+nav.navbar {
+    background-color: cornflowerblue;
+}
+
+a.btn-social {
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: black;
+    min-width: 200px;
+    margin: 6px;
+}
+
+a.btn-google {
+    background-color: #f2f2f2;
+}
+
+a.btn-facebook {
+    background-color: #5890FF;
+}
+
+.centered {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.cta {
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: black;
+    width: 100%;
+    padding: 5px 5px 0px;
+    margin-bottom: 10px;
+    background-color: white;
+}
+
+.cta > .btn {
+    margin-bottom: 5px;
+}
+
+div.form-check {
+    padding-top: 15px;
+}
+
+div.images img {
+    padding: 5px;
+}
+
+i.bi {
+  padding-right: 5px;
+}
