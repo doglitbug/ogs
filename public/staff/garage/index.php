@@ -3,13 +3,19 @@ global $db;
 require_once('../../../private/initialize.php');
 require_admin();
 
-$garages = $db->get_all_garages();
+$options['search'] = get_parameter("search");
+$max_garages = sizeof($db->get_garages($options));
+
+$options['paginate'] = 'true';
+$garages = $db->get_garages($options);
+
 $page_title = 'Garages';
 include(SHARED_PATH . '/staff_header.php');
 ?>
 
 <div id="content">
     <h1><?php echo $page_title; ?></h1>
+    <?php generate_search($options['search']); ?>
     <div>
         <table class="table">
             <tr>
@@ -30,14 +36,12 @@ include(SHARED_PATH . '/staff_header.php');
                     <td><?php echo h($garage['name']); ?></a></td>
                     <td><?php echo nl2br(stripcslashes($garage['description'])); ?></td>
                     <td><?php echo h($garage['location']); ?></td>
+                    <td><?php echo $garage['visible'] == 1 ? 'Yes' : 'No'; ?></a></td>
                     <td><?php echo h($garage['created_at']); ?></a></td>
                     <td><?php echo h($garage['updated_at']); ?></a></td>
 
                     <td><a class="action"
-                           href="<?php echo url_for('/staff/garage/show.php?id=' . h(u($garage['garage_id']))); ?>">View</a>
-                    </td>
-                    <td><a class="action"
-                           href="<?php echo url_for('/staff/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">Edit</a>
+                           href="<?php echo url_for('/staff/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">View/Edit</a>
                     </td>
                     <td><a class="action"
                            href="<?php echo url_for('/staff/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>">Delete</a>
@@ -45,6 +49,7 @@ include(SHARED_PATH . '/staff_header.php');
                 </tr>
             <?php } ?>
         </table>
+        <?php generate_pagination_links($max_garages); ?>
     </div>
 </div>
 

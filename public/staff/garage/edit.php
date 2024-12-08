@@ -1,9 +1,15 @@
 <?php
 global $db;
-require_once('../../private/initialize.php');
-require_login();
+require_once('../../../private/initialize.php');
+require_admin();
 
-$garage = [];
+$id = $_GET['id'] ?? '0';
+
+$garage = $db->get_garage($id);
+if ($garage == null) {
+    $_SESSION['error'] = 'Garage not found';
+    redirect_to(url_for('/garage/index.php'));
+}
 
 if (is_post_request()) {
     $garage['name'] = clean_input($_POST['name']);
@@ -14,43 +20,45 @@ if (is_post_request()) {
     $errors = validate_garage($garage);
 
     if (empty($errors)) {
-        $new_id = $db->insert_garage($garage);
-        $db->set_user_garage_access($_SESSION['user_id'], $new_id, "Owner");
-        $_SESSION['message'] = 'Garage created successfully';
-        redirect_to(url_for('/garage/show.php?id=' . $new_id));
+        $db->update_garage($garage);
+        $_SESSION['message'] = 'Garage updated successfully';
+        redirect_to(url_for('staff/garage'));
     }
-} else {
-    $garage['name'] = '';
-    $garage['description'] = '';
-    $garage['location_id'] = $_SESSION['location_id'];
-    $garage['visible'] = '1';
 }
 
 $locations = $db->get_locations();
 
-$garage_title = 'New Garage';
-include(SHARED_PATH . '/public_header.php');
+$page_title = 'Edit Garage: ' . h($garage['name']);
+include(SHARED_PATH . '/staff_header.php');
 ?>
 
     <div id="content">
-        <h1><?php echo $garage_title; ?></h1>
+        <h1>Edit Garage</h1>
 
         <div class="cta">
-            <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>"><i
+            <a class="btn btn-primary action"
+               href="<?php echo url_for('staff/garage/show.php?id=' . h(u($garage['garage_id']))); ?>"><i
                         class="bi bi-arrow-left"></i>Back</a>
         </div>
 
-        <p>
-            Creating a garage is the first step to getting up and running!<br/>
-            Please fill out the form below and click 'Create Garage' to continue!
-        </p>
-        <form class="row g-3" action="<?php echo url_for('/garage/create.php'); ?>" method="post">
+        <form class="row g-3" method="post">
             <div class="col-md-6">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" class="form-control" placeholder="Garage name" aria-label="Garage name"
                        name="name"
                        value="<?php echo h($garage['name']); ?>">
                 <?php validation('name'); ?>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input type="hidden" name="visible" value="0"/>
+                    <input class="form-check-input" type="checkbox" name="visible" value="1"
+                           id="visible" <?php if ($garage['visible'] == 1) echo "checked"; ?>>
+                    <label class="form-check-label" for="visible">
+                        Visible to public?
+                    </label>
+                </div>
+                <?php validation('visible'); ?>
             </div>
             <div class="col-md-6">
                 <label for="location" class="form-label">Location</label>
@@ -65,33 +73,21 @@ include(SHARED_PATH . '/public_header.php');
                     }
                     ?>
                 </select>
-                <?php if (isset($errors['location'])) {
-                    echo '<div class="text-danger">' . $errors['location'] . '</div>';
-                } ?>
+                <?php validation('location'); ?>
             </div>
-            <div class="col-md-6">
-                <div class="form-check form-switch">
-                    <input type="hidden" name="visible" value="0"/>
-                    <input class="form-check-input" type="checkbox" name="visible" value="1"
-                           id="visible" <?php if ($garage['visible'] == 1) echo "checked"; ?>>
-                    <label class="form-check-label" for="visible">
-                        Visible to public?
-                    </label>
-                </div>
-                <?php validation('visible'); ?>
-            </div>
+
             <div class="col-12">
                 <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" placeholder="Garage description" aria-label="Description"
+                <textarea type="text" class="form-control" placeholder="Garage description" aria-label="Description"
                           name="description"
                           rows="5"><?php echo stripcslashes($garage['description']); ?></textarea>
                 <?php validation('description'); ?>
             </div>
 
             <div class="col-12" id="operations">
-                <button type="submit" class="btn btn-success">Create Garage</button>
+                <button type="submit" class="btn btn-warning">Edit Garage</button>
             </div>
         </form>
     </div>
 
-<?php include(SHARED_PATH . '/public_footer.php'); ?>
+<?php include(SHARED_PATH . '/staff_footer.php'); ?>

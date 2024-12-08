@@ -43,9 +43,7 @@ if (!empty($_GET['code'])) {
             $_SESSION['email'] = $profile['email'];
 
             if ($db->check_email_exists($_SESSION['email'])) {
-                //Get user from DB and log in
                 log_in();
-                $_SESSION['message'] = "Welcome back " . $_SESSION['username'];
                 redirect_to(url_for('/'));
             } else {
                 echo 'Account not found, would you like to make a new one?';

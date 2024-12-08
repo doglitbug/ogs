@@ -13,17 +13,21 @@ function is_logged_in(): bool
  */
 function log_in(): void
 {
-    //TODO Remove location or location_id
-    //Included here to provide a default location for new garages
-    //TODO Log in by id???
+    //TODO Remove location or location_id, included here to provide a default location for new garages
     global $db;
     $user = $db->get_user_by_email($_SESSION['email']);
 
-    $_SESSION['user_id'] = $user['user_id'];
-    $_SESSION['username'] = $user['username'];
-    $_SESSION['name'] = $user['name'];
-    $_SESSION['location_id'] = $user['location_id'];
-    $_SESSION['location'] = $user['location'];
+    if ($user['locked_out'] == '0') {
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['name'] = $user['name'];
+        $_SESSION['location_id'] = $user['location_id'];
+        $_SESSION['location'] = $user['location'];
+        $_SESSION['message'] = "Welcome back " . $_SESSION['username'];
+    } else {
+        //TODO Please contact webmaster (set email in settings?)
+        $_SESSION['message'] = "This account has been locked out";
+    }
 }
 
 /** Log out the currently logged-in user
@@ -35,8 +39,9 @@ function log_out(): void
 {
     unset($_SESSION['user_id']);
     unset($_SESSION['email']);
-    unset($_SESSION['username'] );
+    unset($_SESSION['username']);
     unset($_SESSION['name']);
     unset($_SESSION['location']);
+    unset($_SESSION['location_id']);
     session_destroy();
 }

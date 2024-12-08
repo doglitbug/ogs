@@ -5,7 +5,7 @@ class DotEnv
     /**
      * @var string The directory where the .env file can be located.
      */
-    protected $path;
+    protected string $path;
 
     public function __construct(string $path)
     {

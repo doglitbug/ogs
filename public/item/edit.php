@@ -22,9 +22,9 @@ if (is_post_request()) {
     //Check to see if POST data was discarded due to overlarge file
     if (count($_POST) != 0) {
         //garage_id pulled from database!
-        $item['name'] = clean_input($_POST['name'], []) ?? '';
-        $item['description'] = clean_input($_POST['description']) ?? '';
-        $item['visible'] = $_POST['visible'] ?? '';
+        $item['name'] = clean_input($_POST['name']);
+        $item['description'] = clean_input($_POST['description'], true);
+        $item['visible'] = clean_input($_POST['visible']);
 
         $errors = validate_item($item, $_FILES);
 

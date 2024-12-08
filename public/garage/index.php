@@ -2,7 +2,7 @@
 global $db;
 require_once('../../private/initialize.php');
 
-$public_garages = $db->get_all_garages(['visible' => '1']);
+$public_garages = $db->get_garages(['visible' => '1']);
 $my_garages = [];
 if (is_logged_in()) {
     $my_garages = $db->get_garages_by_user($_SESSION['user_id']);

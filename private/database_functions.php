@@ -123,12 +123,23 @@ class Database
 #endregion
 
 #region user
-    /** Get first 10 users, used for debugging at this time
+    /** Get all users
+     * @param array $options search: Filter to search
+     *                       paginate: Use pagination to return only a subset
      * @return array
+     * @todo change this to a full text search?
      */
-    public
-    function get_all_users(): array
+    public function get_users(array $options = []): array
     {
+        if (isset($options['search'])) {
+            $search = $this->escape($options['search']);
+            $extra_queries[] = <<<SQL
+            username LIKE '%$search%'
+            OR name LIKE '%$search%'
+            OR email LIKE '%$search%'
+            SQL;
+        }
+
         $query = <<<SQL
         SELECT  user_id,
                 username,
@@ -136,6 +147,7 @@ class Database
                 email,
                 user.description,
                 location.description as location,
+                locked_out,
                 IFNULL(admin.description, 'User') as access,
                 user.created_at,
                 user.updated_at
@@ -143,8 +155,20 @@ class Database
         LEFT JOIN location using (location_id)
         LEFT JOIN user_admin using (user_id)
         LEFT JOIN admin using (admin_id)
-        LIMIT 10
         SQL;
+
+        if (isset($extra_queries)) {
+            //First query needs to add WHERE
+            $query .= "\nWHERE " . $extra_queries[0];
+            //Subsequent queries need AND
+            for ($i = 1; $i < sizeof($extra_queries); $i++) {
+                $query .= "\nAND " . $extra_queries[$i];
+            }
+        }
+
+        if (isset($options['paginate'])) {
+            $query .= $this->generate_pagination_sql();
+        }
 
         return $this->get_query($query);
     }
@@ -162,6 +186,7 @@ class Database
                 user.description,
                 location_id,
                 location.description as location,
+                locked_out,
                 IFNULL(admin.description, 'User') as access,
                 user.created_at,
                 user.updated_at
@@ -197,6 +222,7 @@ class Database
                 email,
                 location_id,
                 location.description as location,
+                locked_out,
                 user.created_at,
                 user.updated_at
         FROM user
@@ -223,18 +249,19 @@ class Database
         $name = $this->escape($user['name']);
         $username = $this->escape($user['username']);
         $location_id = $this->escape($user['location_id']);
+        $locked_out = $this->escape($user['locked_out']);
         $description = $this->escape($user['description']);
 
         $query = <<<SQL
         UPDATE user SET name = '$name',
                         username = '$username',
                         description = '$description',
-                        location_id = '$location_id'
+                        location_id = '$location_id',
+                        locked_out = '$locked_out'
         WHERE user_id = '$user_id'
         LIMIT 1
         SQL;
 
-        dump($query);
         $this->update_query($query);
     }
 
@@ -278,9 +305,22 @@ class Database
      * @return array
      */
     public
-    function get_all_garages(array $options = []): array
+    function get_garages(array $options = []): array
     {
-        $visible_query = isset($options['visible']) ? "WHERE visible = '" . $this->escape($options['visible']) . "'" : "";
+        if (isset($options['visible'])) {
+            $visible = $this->escape($options['visible']);
+            $extra_queries[] = <<<SQL
+            visible = '$visible'
+            SQL;
+        }
+
+        if (isset($options['search'])) {
+            $search = $this->escape($options['search']);
+            $extra_queries[] = <<<SQL
+            name LIKE '%$search%'
+            OR garage.description LIKE '%$search%'
+            SQL;
+        }
 
         $query = <<<SQL
         SELECT  garage_id,
@@ -292,8 +332,20 @@ class Database
                 garage.created_at
         FROM garage
         LEFT JOIN location using (location_id)
-        {$visible_query}
         SQL;
+
+        if (isset($extra_queries)) {
+            //First query needs to add WHERE
+            $query .= "\nWHERE " . $extra_queries[0];
+            //Subsequent queries need AND
+            for ($i = 1; $i < sizeof($extra_queries); $i++) {
+                $query .= "\nAND " . $extra_queries[$i];
+            }
+        }
+
+        if (isset($options['paginate'])) {
+            $query .= $this->generate_pagination_sql();
+        }
 
         return $this->get_query($query);
     }
@@ -340,7 +392,7 @@ class Database
     public function get_garages_by_user(string $user_id, array $options = []): array
     {
         $user_id = $this->escape($user_id);
-        $access_query = isset($options['access']) ? "AND access.description='" . $this->escape($options['access']) . "'" : '';
+        $access_query = isset($options['access']) ? "and access . description = '" . $this->escape($options['access']) . "'" : '';
 
         $query = <<<SQL
         SELECT  user_id,
@@ -398,13 +450,13 @@ class Database
         $visible = $this->escape($garage['visible']);
 
         $query = <<<SQL
-            INSERT INTO garage
-            (name, description, location_id, visible)
-            VALUES ('$name',
-                    '$description',
-                    '$location_id',
-                    '$visible'
-                    )
+        INSERT INTO garage
+        (name, description, location_id, visible)
+        VALUES ('$name',
+                '$description',
+                '$location_id',
+                '$visible'
+                )
         SQL;
 
         return $this->insert_query($query);
@@ -467,39 +519,39 @@ class Database
     public function get_items(array $options = []): array
     {
         if (isset($options['garage_id'])) {
-            $extra_queries[] = "garage_id='" . $this->escape($options['garage_id']) . "'";
+            $extra_queries[] = "garage_id = '" . $this->escape($options['garage_id']) . "'";
         }
 
-        if (isset($options['search'])) {
-            $extra_queries[] = "MATCH(item.name, item.description) AGAINST('" . $this->escape($options['search']) . "')";
+        if (isset($options['search']) && $options['search'] != "") {
+            $extra_queries[] = "match (item . name, item . description) AGAINST('" . $this->escape($options['search']) . "')";
         }
 
-        //TODO Hide if garage is hidden as well?
         if (isset($options['visible'])) {
-            $extra_queries[] = "visible='" . $this->escape($options['visible']) . "'";
+            $extra_queries[] = "item.visible = '1' AND garage.visible = '1'";
         }
 
         $query = <<<SQL
-        SELECT item.item_id,
-               garage_id,
-               name,
-               description,
-               visible,
-               item.updated_at,
-               item.created_at,
-               image.image_id,
-               image.width,
-               image.height,
-               CONCAT(path, '/', filename) as source
+        SELECT  item.item_id,
+                garage_id,
+                item.name,
+                item.description,
+                item.visible,
+                item.updated_at,
+                item.created_at,
+                image.image_id,
+                image.width,
+                image.height,
+                CONCAT(path, '/', filename) as source
         FROM item
-                 LEFT JOIN LATERAL (SELECT *
+        LEFT JOIN LATERAL (SELECT   *
                                     FROM item_image
                                     WHERE item.item_id = item_image.item_id
                                     ORDER BY main DESC
                                     LIMIT 1) as iii
-            using (item_id)
-                 LEFT JOIN (SELECT *
+        using (item_id)
+        LEFT JOIN (SELECT   *
                             FROM image) as image using (image_id)
+        LEFT JOIN garage USING (garage_id)
         SQL;
 
         if (isset($extra_queries)) {
@@ -528,7 +580,7 @@ class Database
     {
         $item_id = $this->escape($item_id);
 
-        $visible_query = isset($options['public']) ? "IF(item.visible AND garage.visible, true, false) as visible" : "item.visible";
+        $visible_query = isset($options['public']) ? "if (item . visible and garage . visible, true, false) as visible" : "item . visible";
 
         $query = <<<SQL
         SELECT  item.item_id,
@@ -621,7 +673,7 @@ class Database
      * @return array
      */
     public
-    function get_all_locations(): array
+    function get_locations(): array
     {
         $query = <<<SQL
         SELECT  location_id,

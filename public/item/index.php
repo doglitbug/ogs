@@ -3,8 +3,8 @@ global $db;
 require_once('../../private/initialize.php');
 
 $search = (get_parameter("search"));
-
 $options['search'] = $search;
+$options['visible'] = '1';
 
 $max_items = sizeof($db->get_items($options));
 $options['paginate'] = 'true';
@@ -14,8 +14,10 @@ $page_title = 'Search results: ' . h($search);
 include(SHARED_PATH . '/public_header.php');
 ?>
 
-<h1><?php echo $page_title; ?></h1>
 <div id="content">
+    <h1><?php echo $page_title; ?></h1>
+    <?php generate_search($options['search']); ?>
+
     <div>
         <table class="table table-hover">
             <thead>

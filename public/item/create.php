@@ -20,10 +20,9 @@ if (!is_owner_or_worker($garage)) {
 }
 
 if (is_post_request()) {
-    $item['garage_id'] = $garage['garage_id'];
-    $item['name'] = clean_input($_POST['name'], []) ?? '';
-    $item['description'] = clean_input($_POST['description']) ?? '';
-    $item['visible'] = $_POST['visible'] ?? '';
+    $item['name'] = clean_input($_POST['name']);
+    $item['description'] = clean_input($_POST['description'], true);
+    $item['visible'] = clean_input($_POST['visible']);
 
     $errors = validate_item($item, $_FILES);
 
