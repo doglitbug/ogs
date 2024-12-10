@@ -149,7 +149,6 @@ class Database
             }
             //Execute
             $statement->execute();
-            //Retrieve
             //Close
             $statement->close();
         } catch (Exception) {
@@ -164,7 +163,7 @@ class Database
      * @param array $options search: Filter to search
      *                       paginate: Use pagination to return only a subset
      * @return array
-     * @todo change this to a full text search?
+     * @todo Change this to a full text search?
      */
     public function get_users(array $options = []): array
     {
@@ -233,7 +232,7 @@ class Database
         SQL;
 
         $result = $this->get_query($query, "s", [$user_id]);
-        return $result ? $result[0] : null;
+
     }
 
     /** Get user by email address
@@ -400,10 +399,9 @@ class Database
 
     /** Get all garages that this user has access to
      * @param string $user_id
-     * @param array $options    access: Owner or Worker
+     * @param array $options access: Owner or Worker
      * @return array|null
      * @todo Do this as an option/filter in get_all_garages?
-
      */
     public function get_garages_by_user(string $user_id, array $options = []): array|null
     {
@@ -535,17 +533,8 @@ class Database
      */
     public function get_items(array $options = []): array
     {
-        if (isset($options['garage_id'])) {
-            $extra_queries[] = "garage_id = '" . $this->escape($options['garage_id']) . "'";
-        }
-
-        if (isset($options['search']) && $options['search'] != "") {
-            $extra_queries[] = "match (item . name, item . description) AGAINST('" . $this->escape($options['search']) . "')";
-        }
-
-        if (isset($options['visible'])) {
-            $extra_queries[] = "item.visible = '1' AND garage.visible = '1'";
-        }
+        $types = "";
+        $values = array();
 
         $query = <<<SQL
         SELECT  item.item_id,
@@ -571,33 +560,48 @@ class Database
         LEFT JOIN garage USING (garage_id)
         SQL;
 
-        if (isset($extra_queries)) {
-            //First query needs to add WHERE
-            $query .= "\nWHERE " . $extra_queries[0];
-            //Subsequent queries need AND
-            for ($i = 1; $i < sizeof($extra_queries); $i++) {
-                $query .= "\nAND " . $extra_queries[$i];
-            }
+        $where_and = "WHERE";
+
+        if (isset($options['garage_id'])) {
+            $query .= <<<SQL
+            
+                $where_and garage_id = ?
+            SQL;
+            $types .= "s";
+            $values[] = $options['garage_id'];
+            $where_and = "AND";
         }
 
-        if (isset($options['paginate'])) {
-            $query .= $this->generate_pagination_sql();
+        if (isset($options['visible'])) {
+            $query .= <<<SQL
+            
+            $where_and item.visible = '1' AND garage.visible = '1'
+        SQL;
+            $where_and = "AND";
         }
 
-        return $this->get_query($query);
+        if (isset($options['search']) && $options['search'] != "") {
+            $query .= <<<SQL
+
+                $where_and MATCH (item.name, item.description) AGAINST (?)
+            SQL;
+            $types .= "s";
+            $values[] = $options['search'];
+            $where_and = "AND";
+        }
+
+        return $this->get_query($query, $types, $values, $options);
     }
 
     /** Get an individual item, usually for show/edit item
      * @param string $item_id
      * @param array $options public: garage hidden will override visibility
-     * @return array
+     * @return array|null
+     * @todo set visible query as an extra query??
      */
-    public
-    function get_item(string $item_id, array $options = []): array
+    public function get_item(string $item_id, array $options = []): array|null
     {
-        $item_id = $this->escape($item_id);
-
-        $visible_query = isset($options['public']) ? "if (item . visible and garage . visible, true, false) as visible" : "item . visible";
+        $visible_query = isset($options['public']) ? "if (item.visible and garage.visible, true, false) as visible" : "item.visible";
 
         $query = <<<SQL
         SELECT  item.item_id,
@@ -607,79 +611,56 @@ class Database
                 $visible_query
         FROM item
         LEFT JOIN garage USING (garage_id)
-        WHERE item_id = '$item_id'
+        WHERE item_id = ?
         LIMIT 1
         SQL;
 
-        $result = $this->get_query($query);
-        if ($result) {
-            return $result[0];
-        } else {
-            return [];
-        }
+        $result = $this->get_query($query, "s", [$item_id]);
+        return $result ? $result[0] : null;
     }
 
     /** Insert a new item
      * @param array $item
      * @return int
      */
-    public
-    function insert_item(array $item): int
+    public function insert_item(array $item): int
     {
-        $garage_id = $this->escape($item['garage_id']);
-        $name = $this->escape($item['name']);
-        $description = $this->escape($item['description']);
-        $visible = $this->escape($item['visible']);
-
         $query = <<<SQL
             INSERT INTO item
             (garage_id, name, description, visible)
-            VALUES  ('$garage_id',
-                    '$name',
-                    '$description',
-                    '$visible'
-                    )
+            VALUES  (?, ?, ?, ?)
         SQL;
 
-        return $this->insert_query($query);
+        return $this->insert_query($query, "ssss", [$item['garage_id'], $item['name'], $item['description'], $item['visible']]);
     }
 
-    public
-    function update_item(array $item): void
+    public function update_item(array $item): void
     {
-        $item_id = $this->escape($item['item_id']);
-        $garage_id = $this->escape($item['item_id']);
-        $name = $this->escape($item['name']);
-        $description = $this->escape($item['description']);
-        $visible = $this->escape($item['visible']);
-
         $query = <<<SQL
-        UPDATE item SET name = '$name',
-                        description = '$description',
-                        visible = '$visible'
-        WHERE item_id = '$item_id'
+        UPDATE item SET garage_id = ?,
+                        name = ?,
+                        description = ?,
+                        visible = ?
+        WHERE item_id = ?
         LIMIT 1
         SQL;
 
-        $this->update_query($query);
+        $this->update_query($query, "sssss", [$item['garage_id'], $item['name'], $item['description'], $item['visible'], $item['item_id']]);
     }
 
     /** Delete an item, assumes item_image links have been removed
      * @param array $item
      * @return void
      */
-    public
-    function delete_item(array $item): void
+    public function delete_item(array $item): void
     {
-        $item_id = $this->escape($item['item_id']);
-
         $query = <<<SQL
         DELETE FROM item
-        WHERE item_id = '$item_id'
+        WHERE item_id = ?
         LIMIT 1;
         SQL;
 
-        $this->delete_query($query);
+        $this->delete_query($query, "s", [$item['item_id']]);
     }
 
 
@@ -711,22 +692,17 @@ class Database
      * @param string $access
      * @return void
      */
-    public
-    function set_user_garage_access(string $user_id, string $garage_id, string $access): void
+    public function set_user_garage_access(string $user_id, string $garage_id, string $access): void
     {
-        $user_id = $this->escape($user_id);
-        $garage_id = $this->escape($garage_id);
-        $access = $this->escape($access);
-
         $query = <<<SQL
         REPLACE INTO user_garage_access
             (user_id, garage_id, access_id)
-            VALUES ('$user_id',
-                    '$garage_id',
-                    (SELECT access_id FROM access WHERE description = '$access'))
+            VALUES (?,
+                    ?,
+                    (SELECT access_id FROM access WHERE description = ?))
         SQL;
 
-        $this->insert_query($query);
+        $this->insert_query($query, "sss", [$user_id, $garage_id, $access]);
     }
 
     /** Find this users access level for this garage
@@ -734,63 +710,49 @@ class Database
      * @param string $garage_id
      * @return string Owner|Worker|User
      */
-    public
-    function get_user_access(string $user_id, string $garage_id): string
+    public function get_user_access(string $user_id, string $garage_id): string
     {
-        $user_id = $this->escape($user_id);
-        $garage_id = $this->escape($garage_id);
-
         $query = <<<SQL
         SELECT IFNULL((
             SELECT description
             FROM user_garage_access
             LEFT JOIN access using (access_id)
-            WHERE user_id='$user_id'
-            AND garage_id='$garage_id'
+            WHERE user_id = ?
+            AND garage_id = ?
             LIMIT 1),
         "User") access;
         SQL;
-
-        return $this->get_query($query)[0]['access'];
+        return $this->get_query($query, "ss", [$user_id, $garage_id])[0]['access'];
     }
 
 #endregion
+
 #region image
     /** Get a single image from the database
      * @param string $image_id
-     * @return array
+     * @return array|null
      */
-    public
-    function get_image(string $image_id): array
+    public function get_image(string $image_id): array|null
     {
-        $image_id = $this->escape($image_id);
-
         $query = <<<SQL
         SELECT  image_id,
                 width,
                 height,
                 CONCAT(path, '/', filename) as source
         FROM image
-        WHERE image_id = '$image_id'
+        WHERE image_id = ?
         SQL;
 
-        $result = $this->get_query($query);
-        if ($result) {
-            return $result[0];
-        } else {
-            return [];
-        }
+        $result = $this->get_query($query, "s", [$image_id]);
+        return $result ? $result[0] : null;
     }
 
     /** Get the images for an item
      * @param string $item_id
      * @return array
      */
-    public
-    function get_item_images(string $item_id): array
+    public function get_item_images(string $item_id): array
     {
-        $item_id = $this->escape($item_id);
-
         $query = <<<SQL
         SELECT  item_id,
                 image_id,
@@ -800,36 +762,26 @@ class Database
                 CONCAT(path, '/', filename) as source
         FROM item_image
         JOIN image using (image_id) 
-        WHERE item_id = '$item_id'
+        WHERE item_id = ?
         ORDER BY main DESC
         SQL;
 
-        return $this->get_query($query);
+        return $this->get_query($query, "s", [$item_id]);
     }
 
     /** Insert a new image into the database, assumes it has been moved to the correct location
      * @param array $image
      * @return int image_id
      */
-    public
-    function insert_image(array $image): int
+    public function insert_image(array $image): int
     {
-        $width = $this->escape($image['width']);
-        $height = $this->escape($image['height']);
-        $path = $this->escape($image['path']);
-        $filename = $this->escape($image['filename']);
-
         $query = <<<SQL
             INSERT INTO image
             (width, height, path, filename)
-            VALUES ('$width',
-                    '$height',
-                    '$path',
-                    '$filename'
-                    )
+            VALUES (?, ?, ?, ?)
         SQL;
 
-        return $this->insert_query($query);
+        return $this->insert_query($query, "ssss", [$image['width'], $image['height'], $image['path'], $image['filename']]);
     }
 
     /** Link an image to a garage
@@ -838,22 +790,15 @@ class Database
      * @param string $main is this the main image?
      * @return void
      */
-    public
-    function insert_garage_image(string $garage_id, string $image_id, string $main = "0"): void
+    public function insert_garage_image(string $garage_id, string $image_id, string $main = "0"): void
     {
-        $garage_id = $this->escape($garage_id);
-        $image_id = $this->escape($image_id);
-
         $query = <<<SQL
             INSERT IGNORE INTO garage_image
             (garage_id, image_id, main)
-            VALUES ('$garage_id',
-                    '$image_id',
-                    '$main'
-                    )
+            VALUES (?, ?, ?)
         SQL;
 
-        $this->insert_query($query);
+        $this->insert_query($query, "sss", [$garage_id, $image_id, $main]);
     }
 
     /** Link an image to an item
@@ -862,22 +807,15 @@ class Database
      * @param string $main is this the main image?
      * @return void
      */
-    public
-    function insert_item_image(string $item_id, string $image_id, string $main = "0"): void
+    public function insert_item_image(string $item_id, string $image_id, string $main = "0"): void
     {
-        $item_id = $this->escape($item_id);
-        $image_id = $this->escape($image_id);
-
         $query = <<<SQL
             INSERT IGNORE INTO item_image
             (item_id, image_id, main)
-            VALUES ('$item_id',
-                    '$image_id',
-                    '$main'
-                    )
+            VALUES (?, ?, ?)
         SQL;
 
-        $this->insert_query($query);
+        $this->insert_query($query, "sss", [$item_id, $image_id, $main]);
     }
 
     /** Remove image from database, assumes that the file has already been removed
@@ -885,18 +823,15 @@ class Database
      * @param array $image
      * @return void
      */
-    public
-    function delete_image(array $image): void
+    public function delete_image(array $image): void
     {
-        $image_id = $this->escape($image['image_id']);
-
         $query = <<<SQL
         DELETE FROM image
-        WHERE image_id = '$image_id'
+        WHERE image_id = ?
         LIMIT 1;
         SQL;
 
-        $this->delete_query($query);
+        $this->delete_query($query, "s", [$image['image_id']]);
     }
 
 #endregion
