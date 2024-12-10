@@ -11,7 +11,7 @@ class Database
     public function connect(): void
     {
         try {
-            $this->connection = mysqli_connect($_ENV["DATABASE_HOST"], $_ENV["DATABASE_USER"], $_ENV["DATABASE_PASS"], $_ENV["DATABASE_NAME"]);
+            $this->connection = new mysqli($_ENV["DATABASE_HOST"], $_ENV["DATABASE_USER"], $_ENV["DATABASE_PASS"], $_ENV["DATABASE_NAME"]);
         } catch (Exception) {
             error_database("Could not connect to database");
         }
@@ -63,7 +63,7 @@ class Database
             error_database("Error getting data");
         }
         $array = $result->fetch_all(MYSQLI_ASSOC);
-        mysqli_free_result($result);
+        $result->free();
         return $array;
     }
 
@@ -83,6 +83,7 @@ class Database
         if (!$result) {
             error_database("Error inserting data");
         }
+        $result->free();
         return $this->connection->insert_id;
     }
 
@@ -101,6 +102,7 @@ class Database
         if (!$result) {
             error_database("Error updating data");
         }
+        $result->free();
     }
 
     /**
@@ -118,6 +120,7 @@ class Database
         if (!$result) {
             error_database("Error deleting data");
         }
+        $result->free();
     }
 
 #endregion
