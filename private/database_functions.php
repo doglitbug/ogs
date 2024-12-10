@@ -36,16 +36,6 @@ class Database
         return $this->connection->real_escape_string($string);
     }
 
-    /** Generate pagination SQL
-     * @return string LIMIT x, y
-     */
-    private function generate_pagination_sql(): string
-    {
-        list($page, $size) = get_page_and_size();
-        $offset = ($page - 1) * $size;
-        return "\nLIMIT {$offset}, {$size}";
-    }
-
     /**
      * Perform a get query and return an assoc array of results
      * @param string $query Parameterized query string
@@ -59,7 +49,7 @@ class Database
         if (isset($options['paginate'])) {
             list($page, $size) = get_page_and_size();
             $offset = ($page - 1) * $size;
-            $query .= "\nLIMIT {$offset}, {$size}";
+            $query .= "\nLIMIT $offset, $size";
         }
 
         try {
@@ -232,7 +222,7 @@ class Database
         SQL;
 
         $result = $this->get_query($query, "s", [$user_id]);
-
+        return $result ? $result[0] : null;
     }
 
     /** Get user by email address
@@ -505,7 +495,7 @@ class Database
             ]);
     }
 
-    /** Delete garage, this assumes that this action has only been called by user with authority etc
+    /** Delete garage, this assumes that this action has only been called by user with authority etc.
      * user_garage_access rows will be deleted automatically!
      * @param array $garage
      * @return void
@@ -720,7 +710,7 @@ class Database
             WHERE user_id = ?
             AND garage_id = ?
             LIMIT 1),
-        "User") access;
+        'User') access;
         SQL;
         return $this->get_query($query, "ss", [$user_id, $garage_id])[0]['access'];
     }
