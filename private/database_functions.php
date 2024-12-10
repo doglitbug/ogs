@@ -5,7 +5,7 @@
  */
 class Database
 {
-    #region misc
+#region misc
     private mysqli $connection;
 
     public function connect(): void
@@ -48,23 +48,38 @@ class Database
 
     /**
      * Perform a get query and return an assoc array of results
-     * @param string $query Escaped query string
-     * @return array Results
+     * @param string $query Parameterized query string
+     * @param string $types String of value types, eg "sss"
+     * @param array $values Array of values
+     * @param array $options paginate: Use pagination to return only a subset
+     * @return array|null Results or empty array
      */
-    private
-    function get_query(string $query): array
+    private function get_query(string $query, string $types = "", array $values = [], array $options = []): array|null
     {
+        if (isset($options['paginate'])) {
+            list($page, $size) = get_page_and_size();
+            $offset = ($page - 1) * $size;
+            $query .= "\nLIMIT {$offset}, {$size}";
+        }
+
         try {
-            $result = $this->connection->query($query);
+            //Prepare
+            $statement = $this->connection->prepare($query);
+            //Bind
+            if ($types) {
+                $statement->bind_param($types, ...$values);
+            }
+            //Execute
+            $statement->execute();
+            //Retrieve
+            $results = $statement->get_result()?->fetch_all(MYSQLI_ASSOC);
+            //Close
+            $statement->close();
         } catch (Exception) {
             error_database("Error getting data");
         }
-        if (!$result) {
-            error_database("Error getting data");
-        }
-        $array = $result->fetch_all(MYSQLI_ASSOC);
-        $result->free();
-        return $array;
+
+        return $results;
     }
 
     /**
@@ -72,55 +87,74 @@ class Database
      * @param string $query Escaped query string
      * @return int new ID
      */
-    private
-    function insert_query(string $query): int
+    private function insert_query(string $query, string $types = "", array $values = []): int
     {
         try {
-            $result = $this->connection->query($query);
+            //Prepare
+            $statement = $this->connection->prepare($query);
+            //Bind
+            if ($types) {
+                $statement->bind_param($types, ...$values);
+            }
+            //Execute
+            $statement->execute();
+            //Retrieve
+            $results = $this->connection->insert_id;
+            //Close
+            $statement->close();
         } catch (Exception) {
             error_database("Error inserting data");
         }
-        if (!$result) {
-            error_database("Error inserting data");
-        }
-        $result->free();
-        return $this->connection->insert_id;
+
+        return $results;
     }
 
     /**
      * Perform an update query
-     * @param string $query Escaped query string
+     * @param string $query Parameterized query string
+     * @param string $types String of value types, eg "sss"
+     * @param array $values Array of values
+     * @return void
      */
-    private
-    function update_query(string $query): void
+    private function update_query(string $query, string $types = "", array $values = []): void
     {
         try {
-            $result = $this->connection->query($query);
+            //Prepare
+            $statement = $this->connection->prepare($query);
+            //Bind
+            if ($types) {
+                $statement->bind_param($types, ...$values);
+            }
+            //Execute
+            $statement->execute();
+            //Close
+            $statement->close();
         } catch (Exception) {
             error_database("Error updating data");
         }
-        if (!$result) {
-            error_database("Error updating data");
-        }
-        $result->free();
     }
 
     /**
      * Perform a delete query
      * @param string $query Escaped query string
      */
-    private
-    function delete_query(string $query): void
+    private function delete_query(string $query, string $types = "", array $values = []): void
     {
         try {
-            $result = $this->connection->query($query);
+            //Prepare
+            $statement = $this->connection->prepare($query);
+            //Bind
+            if ($types) {
+                $statement->bind_param($types, ...$values);
+            }
+            //Execute
+            $statement->execute();
+            //Retrieve
+            //Close
+            $statement->close();
         } catch (Exception) {
             error_database("Error deleting data");
         }
-        if (!$result) {
-            error_database("Error deleting data");
-        }
-        $result->free();
     }
 
 #endregion
@@ -134,14 +168,8 @@ class Database
      */
     public function get_users(array $options = []): array
     {
-        if (isset($options['search'])) {
-            $search = $this->escape($options['search']);
-            $extra_queries[] = <<<SQL
-            username LIKE '%$search%'
-            OR name LIKE '%$search%'
-            OR email LIKE '%$search%'
-            SQL;
-        }
+        $types = "";
+        $values = array();
 
         $query = <<<SQL
         SELECT  user_id,
@@ -160,27 +188,30 @@ class Database
         LEFT JOIN admin using (admin_id)
         SQL;
 
-        if (isset($extra_queries)) {
-            //First query needs to add WHERE
-            $query .= "\nWHERE " . $extra_queries[0];
-            //Subsequent queries need AND
-            for ($i = 1; $i < sizeof($extra_queries); $i++) {
-                $query .= "\nAND " . $extra_queries[$i];
-            }
+        $where_and = "WHERE";
+
+        if (isset($options['search']) && $options['search']) {
+            $options['search'] = '%' . $options['search'] . '%';
+            $query .= <<<SQL
+            
+                $where_and username LIKE ?
+                OR name LIKE ?
+                OR email LIKE ?
+            SQL;
+            $types .= "sss";
+            array_push($values, $options['search'], $options['search'], $options['search']);
+            $where_and = "AND";
         }
 
-        if (isset($options['paginate'])) {
-            $query .= $this->generate_pagination_sql();
-        }
-
-        return $this->get_query($query);
+        return $this->get_query($query, $types, $values, $options);
     }
 
-    public
-    function get_user(string $user_id): array
+    /** Get a user by ID
+     * @param string $user_id
+     * @return array|null User details
+     */
+    public function get_user(string $user_id): array|null
     {
-        $user_id = $this->escape($user_id);
-
         $query = <<<SQL
         SELECT  user_id,
                 username,
@@ -197,27 +228,20 @@ class Database
         LEFT JOIN location using (location_id)
         LEFT JOIN user_admin using (user_id)
         LEFT JOIN admin using (admin_id)
-        WHERE user_id = '$user_id'
+        WHERE user_id = ?
         LIMIT 1
         SQL;
 
-        $result = $this->get_query($query);
-        if ($result) {
-            return $result[0];
-        } else {
-            return [];
-        }
+        $result = $this->get_query($query, "s", [$user_id]);
+        return $result ? $result[0] : null;
     }
 
     /** Get user by email address
      * @param string $email
-     * @return array
+     * @return array|null User details
      */
-    public
-    function get_user_by_email(string $email): array
+    public function get_user_by_email(string $email): array|null
     {
-        $email = $this->escape($email);
-
         $query = <<<SQL
         SELECT  user_id,
                 username,
@@ -230,16 +254,12 @@ class Database
                 user.updated_at
         FROM user
         LEFT JOIN location using (location_id)
-        WHERE email='$email'
+        WHERE email = ?
         LIMIT 1
         SQL;
 
-        $result = $this->get_query($query);
-        if ($result) {
-            return $result[0];
-        } else {
-            return [];
-        }
+        $result = $this->get_query($query, "s", [$email]);
+        return $result ? $result[0] : null;
     }
 
     /** Update an existing user
@@ -248,32 +268,33 @@ class Database
      */
     public function update_user(array $user): void
     {
-        $user_id = $this->escape($user['user_id']);
-        $name = $this->escape($user['name']);
-        $username = $this->escape($user['username']);
-        $location_id = $this->escape($user['location_id']);
-        $locked_out = $this->escape($user['locked_out']);
-        $description = $this->escape($user['description']);
-
         $query = <<<SQL
-        UPDATE user SET name = '$name',
-                        username = '$username',
-                        description = '$description',
-                        location_id = '$location_id',
-                        locked_out = '$locked_out'
-        WHERE user_id = '$user_id'
+        UPDATE user SET username = ?,
+                        name = ?,
+                        email = ?,
+                        description = ?,
+                        location_id = ?,
+                        locked_out = ?
+        WHERE user_id = ?
         LIMIT 1
         SQL;
 
-        $this->update_query($query);
+        $this->update_query($query, "sssssss",
+            [$user['username'],
+                $user['name'],
+                $user['email'],
+                $user['description'],
+                $user['location_id'],
+                $user['locked_out'],
+                $user['user_id']
+            ]);
     }
 
     /** Check to see if there is a user in the database with this email
      * @param string $email
      * @return bool
      */
-    public
-    function check_email_exists(string $email): bool
+    public function check_email_exists(string $email): bool
     {
         return $this->get_user_by_email($email) !== [];
     }
@@ -282,21 +303,19 @@ class Database
      * @param string $user_id
      * @return string
      */
-    public
-    function get_access_level(string $user_id): string
+    public function get_access_level(string $user_id): string
     {
-        $user_id = $this->escape($user_id);
-
         $query = <<<SQL
         SELECT IFNULL(admin.description, 'User') as access
         FROM user
         LEFT JOIN user_admin using (user_id)
         LEFT JOIN admin using (admin_id)
-        WHERE user_id='$user_id' 
+        WHERE user_id = ?
         LIMIT 1
         SQL;
 
-        $result = $this->get_query($query);
+        $result = $this->get_query($query, "s", [$user_id]);
+        //TODO Potential error if user not found?
         return $result[0]['access'];
     }
 
@@ -304,26 +323,14 @@ class Database
 
 #region garage
     /** Get all garages
-     * @param array $options visible
+     * @param array $options visible: Are they publicly visible?
+     *                          search: Search term to filter by
      * @return array
      */
-    public
-    function get_garages(array $options = []): array
+    public function get_garages(array $options = []): array
     {
-        if (isset($options['visible'])) {
-            $visible = $this->escape($options['visible']);
-            $extra_queries[] = <<<SQL
-            visible = '$visible'
-            SQL;
-        }
-
-        if (isset($options['search'])) {
-            $search = $this->escape($options['search']);
-            $extra_queries[] = <<<SQL
-            name LIKE '%$search%'
-            OR garage.description LIKE '%$search%'
-            SQL;
-        }
+        $types = "";
+        $values = array();
 
         $query = <<<SQL
         SELECT  garage_id,
@@ -337,31 +344,40 @@ class Database
         LEFT JOIN location using (location_id)
         SQL;
 
-        if (isset($extra_queries)) {
-            //First query needs to add WHERE
-            $query .= "\nWHERE " . $extra_queries[0];
-            //Subsequent queries need AND
-            for ($i = 1; $i < sizeof($extra_queries); $i++) {
-                $query .= "\nAND " . $extra_queries[$i];
-            }
+        $where_and = "WHERE";
+
+        if (isset($options['visible'])) {
+            $query .= <<<SQL
+            
+                $where_and visible = ?
+            SQL;
+            $types .= "s";
+            $values[] = $options['visible'];
+            $where_and = "AND";
         }
 
-        if (isset($options['paginate'])) {
-            $query .= $this->generate_pagination_sql();
+        if (isset($options['search']) && $options['search']) {
+            $options['search'] = '%' . $options['search'] . '%';
+            $query .= <<<SQL
+            
+                $where_and (name LIKE ?
+                OR garage.description LIKE ?)
+            SQL;
+            $types .= "ss";
+            array_push($values, $options['search'], $options['search']);
+            $where_and = "AND";
         }
 
-        return $this->get_query($query);
+        return $this->get_query($query, $types, $values, $options);
     }
 
     /** Get an individual garage
      * @param string $garage_id
-     * @return array
+     * @return array|null
      */
     public
-    function get_garage(string $garage_id): array
+    function get_garage(string $garage_id): array|null
     {
-        $garage_id = $this->escape($garage_id);
-
         $query = <<<SQL
         SELECT  garage_id,
                 name,
@@ -373,29 +389,26 @@ class Database
                 garage.created_at
         FROM garage
         LEFT JOIN location using (location_id)
-        WHERE garage_id='$garage_id'
+        WHERE garage_id = ?
         LIMIT 1
         SQL;
 
-        $result = $this->get_query($query);
+        $result = $this->get_query($query, "s", [$garage_id]);
 
-        if ($result) {
-            return $result[0];
-        } else {
-            return [];
-        }
+        return $result ? $result[0] : null;
     }
 
     /** Get all garages that this user has access to
      * @param string $user_id
-     * @param array $options access Owner or Worker
-     * @return array
-     * TODO Do this as an option/filter in get_all_garages?
+     * @param array $options    access: Owner or Worker
+     * @return array|null
+     * @todo Do this as an option/filter in get_all_garages?
+
      */
-    public function get_garages_by_user(string $user_id, array $options = []): array
+    public function get_garages_by_user(string $user_id, array $options = []): array|null
     {
-        $user_id = $this->escape($user_id);
-        $access_query = isset($options['access']) ? "and access . description = '" . $this->escape($options['access']) . "'" : '';
+        $types = "";
+        $values = array();
 
         $query = <<<SQL
         SELECT  user_id,
@@ -409,22 +422,32 @@ class Database
             LEFT JOIN access using (access_id)
             LEFT JOIN garage using (garage_id)
             LEFT JOIN location using (location_id)
-        WHERE user_id = '$user_id'
-            {$access_query}
-        ORDER BY access 
+        WHERE user_id = ?
         SQL;
 
-        return $this->get_query($query);
+        $types .= "s";
+        $values[] = $user_id;
+
+        $where_and = "AND";
+        if (isset($options['access'])) {
+            $query .= <<<SQL
+
+            $where_and access.description = ?
+        SQL;
+            $types .= "s";
+            $values[] = $options['access'];
+            $where_and = "AND";
+        }
+
+        return $this->get_query($query, $types, $values);
     }
 
     /** Get a list of owners, then workers for this garage
      * @param string $garage_id
-     * @return array
+     * @return array|null
      */
-    public function get_garage_staff(string $garage_id): array
+    public function get_garage_staff(string $garage_id): array|null
     {
-        $garage_id = $this->escape($garage_id);
-
         $query = <<<SQL
         SELECT  user_id,
                 username,
@@ -432,11 +455,11 @@ class Database
         FROM user_garage_access
             LEFT JOIN user USING (user_id)
             LEFT JOIN access using (access_id)
-        WHERE garage_id = '{$garage_id}'
+        WHERE garage_id = ?
         ORDER BY access.access_id
         SQL;
 
-        return $this->get_query($query);
+        return $this->get_query($query, "s", [$garage_id]);
     }
 
     /** Create a new garage
@@ -444,50 +467,44 @@ class Database
      * @return int New ID
      * @note This does not set ownership or access at all!
      */
-    public
-    function insert_garage(array $garage): int
+    public function insert_garage(array $garage): int
     {
-        $name = $this->escape($garage['name']);
-        $description = $this->escape($garage['description']);
-        $location_id = $this->escape($garage['location_id']);
-        $visible = $this->escape($garage['visible']);
-
         $query = <<<SQL
         INSERT INTO garage
-        (name, description, location_id, visible)
-        VALUES ('$name',
-                '$description',
-                '$location_id',
-                '$visible'
-                )
+            (name, description, location_id, visible)
+        VALUES (?, ?, ?, ?)
         SQL;
 
-        return $this->insert_query($query);
+        return $this->insert_query($query, "ssss", [
+            $garage['name'],
+            $garage['description'],
+            $garage['location_id'],
+            $garage['visible'],
+        ]);
     }
 
     /** Update an existing garage
      * @param array $garage
      * @return void
      */
-    public
-    function update_garage(array $garage): void
+    public function update_garage(array $garage): void
     {
-        $garage_id = $this->escape($garage['garage_id']);
-        $name = $this->escape($garage['name']);
-        $description = $this->escape($garage['description']);
-        $location_id = $this->escape($garage['location_id']);
-        $visible = $this->escape($garage['visible']);
-
         $query = <<<SQL
-        UPDATE garage SET   name = '$name',
-                            description = '$description',
-                            location_id = '$location_id',
-                            visible = '$visible'
-        WHERE garage_id = '$garage_id'
+        UPDATE garage SET   name = ?,
+                            description = ?,
+                            location_id = ?,
+                            visible = ?
+        WHERE garage_id = ?
         LIMIT 1
         SQL;
 
-        $this->update_query($query);
+        $this->update_query($query, "sssss",
+            [$garage['name'],
+                $garage['description'],
+                $garage['location_id'],
+                $garage['visible'],
+                $garage['garage_id']
+            ]);
     }
 
     /** Delete garage, this assumes that this action has only been called by user with authority etc
@@ -495,18 +512,15 @@ class Database
      * @param array $garage
      * @return void
      */
-    public
-    function delete_garage(array $garage): void
+    public function delete_garage(array $garage): void
     {
-        $garage_id = $this->escape($garage['garage_id']);
-
         $query = <<<SQL
         DELETE FROM garage
-        WHERE garage_id = '$garage_id'
+        WHERE garage_id = ?
         LIMIT 1;
         SQL;
 
-        $this->delete_query($query);
+        $this->delete_query($query, "s", [$garage['garage_id']]);
     }
 
 #endregion
@@ -691,12 +705,11 @@ class Database
 #endregion
 
 #region user_garage_access
-    /** Set access for user to garage
+    /** Set access for user to garage (will update if already existing!)
      * @param string $user_id
      * @param string $garage_id
      * @param string $access
      * @return void
-     * @todo Change access to int instead of string, check to see if access already exists?
      */
     public
     function set_user_garage_access(string $user_id, string $garage_id, string $access): void
@@ -706,7 +719,7 @@ class Database
         $access = $this->escape($access);
 
         $query = <<<SQL
-        INSERT INTO user_garage_access
+        REPLACE INTO user_garage_access
             (user_id, garage_id, access_id)
             VALUES ('$user_id',
                     '$garage_id',
