@@ -2,7 +2,7 @@
 global $db;
 require_once('../../private/initialize.php');
 
-$id = $_GET['id'] ?? '1';
+$id = $_GET['id'] ?? '0';
 
 $item = $db->get_item($id, ["public" => true]);
 if ($item == null || ($item['visible'] == '0' && !can_edit_item($item))) {
@@ -15,10 +15,8 @@ $images = $db->get_item_images($item['item_id']);
 $page_title = 'Show Item';
 include(SHARED_PATH . '/public_header.php');
 ?>
-
     <div id="content">
         <h1><?php echo $page_title; ?></h1>
-
         <div class="cta">
             <a class="btn btn-primary action"
                href="<?php echo url_for('/garage/show.php?id=' . h(u($item['garage_id']))); ?>"><i class="bi bi-arrow-left"></i>Back</a>

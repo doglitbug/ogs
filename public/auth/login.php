@@ -10,10 +10,11 @@ if (is_post_request()) {
     $_SESSION['email'] = $_POST['email'];
     $_SESSION['logon_method'] = "Impersonation";
     log_in();
-    redirect_to(url_for('user/show.php'));
+    //This needs to be a location that does not require log in, in case we are locked out
+    redirect_to(url_for('/'));
 }
 
-$users = $db->get_all_users();
+$users = $db->get_users();
 
 $page_title = 'Log in';
 include(SHARED_PATH . '/public_header.php');

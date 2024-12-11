@@ -57,7 +57,7 @@ include(SHARED_PATH . '/public_header.php');
                     </tr>
                     <?php if (is_owner_or_worker($garage)) { ?>
                         <tr>
-                            <th>Visibility</th>
+                            <th>Visible</th>
                             <td><?php echo $garage['visible'] == 1 ? 'Visible to public' : 'Hidden from public'; ?></td>
                         </tr>
                     <?php } ?>

@@ -1,22 +1,21 @@
 <?php
 global $db;
-require_once('../../private/initialize.php');
-require_login();
+require_once('../../../private/initialize.php');
+require_admin();
 
-//We can only edit ourselves on the public side
-$id = $_SESSION['user_id'];
+$id = get_parameter('id');
 
 $user = $db->get_user($id);
 if ($user == null) {
     $_SESSION['error'] = 'User not found';
-    redirect_to(url_for('/'));
+    redirect_to(url_for('/staff/user'));
 }
 
 if (is_post_request()) {
     $user['name'] = clean_input($_POST['name']);
     $user['username'] = clean_input($_POST['username']);
     $user['location_id'] = clean_input($_POST['location_id']);
-    $user['locked_out'] = '0';
+    $user['locked_out'] = clean_input($_POST['locked_out']);
     $user['description'] = clean_input($_POST['description'], true);
 
     $errors = validate_user($user);
@@ -24,14 +23,14 @@ if (is_post_request()) {
     if (empty($errors)) {
         $db->update_user($user);
         $_SESSION['message'] = 'User updated successfully';
-        redirect_to(url_for('/user/show.php'));
+        redirect_to(url_for('staff/user/show.php?id=' . h(u($user['user_id']))));
     }
 }
 
 $locations = $db->get_locations();
 
 $page_title = 'Edit User: ' . h($user['username']);
-include(SHARED_PATH . '/public_header.php');
+include(SHARED_PATH . '/staff_header.php');
 ?>
 
     <div id="content">
@@ -39,16 +38,15 @@ include(SHARED_PATH . '/public_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/user/show.php'); ?>">
+               href="<?php echo url_for('/staff/user'); ?>">
                 <i class="bi bi-arrow-left"></i>Back</a>
         </div>
 
-        <form class="row g-3" action="<?php echo url_for('/user/edit.php'); ?>" method="post">
+        <form class="row g-3" method="post">
             <div class="col-md-6">
-                <label for="email" class="form-label">Email (cannot be changed)</label>
+                <label for="email" class="form-label">Email</label>
                 <input type="text" class="form-control" placeholder="email" aria-label="Email"
                        name="email"
-                       disabled
                        value="<?php echo h($user['email']); ?>">
             </div>
             <div class="col-md-6">
@@ -87,6 +85,17 @@ include(SHARED_PATH . '/public_header.php');
                           rows="5"><?php echo stripcslashes($user['description']); ?></textarea>
                 <?php validation('description'); ?>
             </div>
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input type="hidden" name="locked_out" value="0"/>
+                    <input class="form-check-input" type="checkbox" name="locked_out" value="1"
+                           id="locked_out" <?php if ($user['locked_out'] == 1) echo "checked"; ?>>
+                    <label class="form-check-label" for="locked_out">
+                        Locked out?
+                    </label>
+                </div>
+                <?php validation('locked_out'); ?>
+            </div>
 
             <div class="col-12" id="operations">
                 <button type="submit" class="btn btn-warning">Edit User</button>
@@ -94,4 +103,4 @@ include(SHARED_PATH . '/public_header.php');
         </form>
     </div>
 
-<?php include(SHARED_PATH . '/public_footer.php'); ?>
+<?php include(SHARED_PATH . '/staff_footer.php'); ?>

@@ -17,11 +17,10 @@ if (!is_owner($garage['garage_id'])) {
 }
 
 if (is_post_request()) {
-    $garage['garage_id'] = $garage['garage_id'];
-    $garage['name'] = clean_input($_POST['name'], []) ?? '';
-    $garage['description'] = clean_input($_POST['description']) ?? '';
-    $garage['location_id'] = $_POST['location'] ?? '';
-    $garage['visible'] = $_POST['visible'] ?? '';
+    $garage['name'] = clean_input($_POST['name']);
+    $garage['description'] = clean_input($_POST['description'], true);
+    $garage['location_id'] = clean_input($_POST['location']);
+    $garage['visible'] = clean_input($_POST['visible']);
 
     $errors = validate_garage($garage);
 
@@ -32,7 +31,7 @@ if (is_post_request()) {
     }
 }
 
-$locations = $db->get_all_locations();
+$locations = $db->get_locations();
 
 $page_title = 'Edit Garage: ' . h($garage['name']);
 include(SHARED_PATH . '/public_header.php');

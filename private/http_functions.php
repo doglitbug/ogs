@@ -32,8 +32,8 @@ function raw_u(?string $string = ""): string
     return rawurlencode($string);
 }
 
-/** Apply htmlspecialchars to provided value. Used to convert special characters to html equivx
- * @param string|null $string input
+/** Apply htmlspecialchars to provided value. Used to convert special characters to html equiv
+ * @param string|null $string $string input
  * @return string
  */
 function h(?string $string = ""): string
@@ -43,12 +43,16 @@ function h(?string $string = ""): string
 
 /** Attempt to clean up user input
  * @param string|null $input
- * @param array $allowed_tags defaults to b, i
+ * @param bool $allow_html If true, allow a subset of html tags such as b and i
  * @return string
  */
-function clean_input(string|null $input = "", array $allowed_tags = ['b', 'i']): string
+function clean_input(?string $input = "", bool $allow_html = false): string
 {
     global $db;
+    $allowed_tags = [];
+    if ($allow_html) {
+        $allowed_tags = ['b', 'i'];
+    }
     return $db->escape(trim(strip_tags($input, $allowed_tags)));
 }
 
@@ -102,11 +106,16 @@ function is_get_request(): bool
     return $_SERVER['REQUEST_METHOD'] == 'GET';
 }
 
-function get_parameter(string $name, array $options = []): string
+/** Retrieve parameter by name.
+ * Tried POST, then GET, then returns empty string
+ * @param string|null $name
+ * @param array $options Unused
+ * @return string
+ */
+function get_parameter(?string $name, array $options = []): string
 {
     if (isset($_POST[$name])) return $_POST[$name];
     if (isset($_GET[$name])) return $_GET[$name];
-    //TODO Clean up here?
     return "";
 }
 

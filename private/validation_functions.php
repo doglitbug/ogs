@@ -131,7 +131,7 @@ function validate_user(array $user): array
 
     #location
     $location_str = (string)$user['location_id'];
-    $locations = array_column($db->get_all_locations(), 'location_id');
+    $locations = array_column($db->get_locations(), 'location_id');
 
     if (!has_inclusion_of($location_str, $locations)) {
         $errors['location_id'] = "Location must be one of the provided options";
@@ -164,7 +164,7 @@ function validate_garage(array $garage): array
 
     #location
     $location_str = (string)$garage['location_id'];
-    $locations = array_column($db->get_all_locations(), 'location_id');
+    $locations = array_column($db->get_locations(), 'location_id');
 
     if (!has_inclusion_of($location_str, $locations)) {
         $errors['location'] = "Location must be one of the provided options";

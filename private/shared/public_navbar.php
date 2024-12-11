@@ -46,11 +46,6 @@ $current = basename(dirname($_SERVER['PHP_SELF']));
                 }
                 ?>
             </ul>
-
-            <form action="<?php echo url_for('/item/index.php'); ?>" class="d-flex" role="search" method="get">
-                <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
         </div>
     </div>
 </nav>
