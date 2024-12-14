@@ -3,6 +3,8 @@ Online Garage Sale website
 
 ## Deployment steps
 
+First(1) location in database should be 'Unknown'/'Unset'
+
 ### Prevent browser access to index-less folders:
 Edit `/etc/apache2/apache2.conf` and remove `Indexes` or change it to `-Indexes`
 
