@@ -90,11 +90,15 @@ function move_and_link_images(array $images, int $item_id): void
 /** Generate page based search form
  * @param string $search previous search term
  * @param string $destination form action URL
+ * @param array $params additional parameters to add to the form
  * @return void
  */
-function generate_search(string $search = "", string $destination = ""): void
+function generate_search(string $search = "", string $destination = "", array $params = []): void
 {
     echo '<form action = "' . $destination . '" role="search" method="get">';
+    foreach ($params as $key => $value) {
+        echo '<input type="hidden" name="' . $key . '" value="' . $value . '"/>';
+    }
     echo '<div class="input-group mb-2">';
     echo '<input class="form-control" name="search" type="search" placeholder="Search" aria-label="Search" value="' . h($search) . '">';
     echo '<button class="btn btn-primary" type="submit">Search</button>';

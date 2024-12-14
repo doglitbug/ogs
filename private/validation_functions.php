@@ -65,7 +65,7 @@ function has_length(string $value, array $options): bool
  * @param mixed $value
  * @param array $set
  * @return bool
- * @example 5, [1,3,5,7,9]
+ * @example 5, [1,3,5,7,9] = > true
  */
 function has_inclusion_of(mixed $value, array $set): bool
 {
@@ -76,7 +76,7 @@ function has_inclusion_of(mixed $value, array $set): bool
  * @param mixed $value
  * @param array $set
  * @return bool
- * @example 2, [1,3,5,7,9]
+ * @example 2, [1,3,5,7,9] => true
  */
 function has_exclusion_of(mixed $value, array $set): bool
 {
@@ -107,6 +107,13 @@ function has_valid_email(string $value): bool
     return preg_match($email_regex, $value) === 1;
 }
 
+function has_unique_username(array $user): bool
+{
+    global $db;
+    return $db->has_unique_username($user);
+}
+
+
 #endregion
 
 #region validation
@@ -122,11 +129,13 @@ function validate_user(array $user): array
         $errors['name'] = "Name must be between 2 and 255 characters";
     }
 
-    #name
+    #username
     if (is_blank($user['username'])) {
         $errors['username'] = "Username cannot be blank";
     } else if (!has_length($user['username'], ['min' => 2, 'max' => 255])) {
         $errors['username'] = "Username must be between 2 and 255 characters";
+    } else if (has_unique_username($user)){
+        $errors['username'] = "Username must unique, someone else has this name";
     }
 
     #location

@@ -33,7 +33,7 @@ if (is_post_request()) {
 }
 
 
-$page_title = 'Delete Item';
+$page_title = 'Delete Item: ' . $item['name'];
 include(SHARED_PATH . '/public_header.php');
 ?>
 
@@ -42,7 +42,8 @@ include(SHARED_PATH . '/public_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><i class="bi bi-arrow-left"></i>Back</a>
+               href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><i
+                        class="bi bi-arrow-left"></i>Back</a>
         </div>
 
         <p>Are you sure you wish to delete this item?</p>

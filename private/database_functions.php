@@ -119,7 +119,11 @@ class Database
             $statement->execute();
             //Close
             $statement->close();
-        } catch (Exception) {
+        } catch (Exception $e) {
+            dump($query);
+            dump($types);
+            dump($values);
+            dump($e);
             error_database("Error updating data");
         }
     }
@@ -251,6 +255,21 @@ class Database
         return $result ? $result[0] : null;
     }
 
+    /** Add a new user to the database
+     * @param array $user Requires username, name and email
+     * @return int new user ID
+     */
+    public function insert_user(array $user): int
+    {
+        $query = <<<SQL
+        INSERT INTO user
+            (username, name, email)
+            VALUES (?, ?, ?)
+        SQL;
+
+        return $this->insert_query($query, "sss", [$user['username'], $user['name'], $user['email']]);
+    }
+
     /** Update an existing user
      * @param array $user
      * @return void
@@ -285,7 +304,39 @@ class Database
      */
     public function check_email_exists(string $email): bool
     {
-        return $this->get_user_by_email($email) !== [];
+        return $this->get_user_by_email($email) !== null;
+    }
+
+    /** Checks to see that no other user has this email address
+     * Likely to be used when admins change email addresses only
+     * @param array $user Requires user_id and email
+     * @return bool
+     */
+    public function has_unique_email(array $user): bool
+    {
+        $query = <<<SQL
+            SELECT * FROM user
+            WHERE email = ?
+            AND user_id != ?
+        SQL;
+
+        $result = $this->get_query($query, "ss", [$user['email'], $user['user_id']]);
+        return $result != null;
+    }
+    /** Checks to see that no other user has this username
+     * @param array $user Requires user_id and username
+     * @return bool
+     */
+    public function has_unique_username(array $user): bool
+    {
+        $query = <<<SQL
+            SELECT * FROM user
+            WHERE username = ?
+            AND user_id != ?
+        SQL;
+
+        $result = $this->get_query($query, "ss", [$user['username'], $user['user_id']]);
+        return $result != null;
     }
 
     /** Check to see if this user is Super Admin, Admin or ordinary User

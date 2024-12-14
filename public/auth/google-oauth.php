@@ -46,17 +46,17 @@ if (!empty($_GET['code'])) {
                 log_in();
                 redirect_to(url_for('/'));
             } else {
-                echo 'Account not found, would you like to make a new one?';
-                $_SESSION['name'] = implode(' ', $google_name_parts);
-                //$_SESSION['picture'] = $profile['picture'] ?? '';
-                //TODO Grab the Google provided details and redirect to a sign up page to allow user to choose the following:
-                // username
-                // name (prefilled from google)
-                // email (uneditable or not shown(!) and prefilled from google)
-                // location, use drop down, but google location later on
-                echo '<pre>';
-                var_dump($_SESSION);
-                echo '</pre>';
+                //Create new user, log them in and sent to profile page to update username/description/location
+                $user = [];
+
+                $user['username'] = $profile['email'];
+                $user['name'] = implode(' ', $google_name_parts);
+                $user['email'] = $profile['email'];
+
+                $new_id = $db->insert_user($user);
+                log_in();
+                $_SESSION['message'] = 'Please choose a new username, set your location and tell us a bit about yourself!';
+                redirect_to(url_for('user/edit.php'));
             }
         } else {
             //TODO Close $db, or redirect to error page that does!

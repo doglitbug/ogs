@@ -38,7 +38,7 @@ include(SHARED_PATH . '/public_header.php');
 ?>
 
     <div id="content">
-        <h1>Edit Garage</h1>
+        <h1><?php echo $page_title; ?></h1>
 
         <div class="cta">
             <a class="btn btn-primary action"
