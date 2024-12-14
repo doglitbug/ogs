@@ -12,6 +12,7 @@ if ($user == null) {
 }
 
 if (is_post_request()) {
+    $user['id'] = $id;
     $user['name'] = clean_input($_POST['name']);
     $user['username'] = clean_input($_POST['username']);
     $user['location_id'] = clean_input($_POST['location_id']);
@@ -23,7 +24,7 @@ if (is_post_request()) {
     if (empty($errors)) {
         $db->update_user($user);
         $_SESSION['message'] = 'User updated successfully';
-        redirect_to(url_for('staff/user/show.php?id=' . h(u($user['user_id']))));
+        redirect_to(url_for('staff/user'));
     }
 }
 

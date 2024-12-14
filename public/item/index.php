@@ -10,7 +10,7 @@ $max_items = sizeof($db->get_items($options));
 $options['paginate'] = 'true';
 $shown_items = $db->get_items($options);
 
-$page_title = 'Search results: ' . h($search);
+$page_title = 'Search: ' . h($search);
 include(SHARED_PATH . '/public_header.php');
 ?>
 

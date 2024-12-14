@@ -15,6 +15,9 @@ $options['garage_id'] = $garage['garage_id'];
 //Hide hidden items unless owner/worker
 if (!is_owner_or_worker($garage)) $options['visible'] = '1';
 
+$search = (get_parameter("search"));
+$options['search'] = $search;
+
 $max_items = sizeof($db->get_items($options));
 $options['paginate'] = 'true';
 $shown_items = $db->get_items($options);
@@ -86,15 +89,19 @@ include(SHARED_PATH . '/public_header.php');
 
 
         <h1>Items:</h1>
-        <?php if (is_owner_or_worker($garage)) {
-            ?>
-            <div class="cta">
+        <div class="cta">
+            <?php if (is_owner_or_worker($garage)) {
+                ?>
+
                 <a class="btn btn-success action"
                    href="<?php echo url_for('/item/create.php?garage_id=' . h(u($garage['garage_id']))); ?>"><i
                             class="bi bi-plus-lg"></i>Add
                     Item</a>
-            </div>
-        <?php } ?>
+
+            <?php } ?>
+
+            <?php generate_search($options['search'], "", ['id' => h(u($garage['garage_id']))]); ?>
+        </div>
 
         <div>
             <table class="table table-hover">

@@ -12,19 +12,22 @@ if ($item == null || ($item['visible'] == '0' && !can_edit_item($item))) {
 
 $images = $db->get_item_images($item['item_id']);
 
-$page_title = 'Show Item';
+$page_title = 'Show Item: ' . $item['name'];
 include(SHARED_PATH . '/public_header.php');
 ?>
     <div id="content">
         <h1><?php echo $page_title; ?></h1>
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/garage/show.php?id=' . h(u($item['garage_id']))); ?>"><i class="bi bi-arrow-left"></i>Back</a>
+               href="<?php echo url_for('/garage/show.php?id=' . h(u($item['garage_id']))); ?>"><i
+                        class="bi bi-arrow-left"></i>Back</a>
             <?php if (can_edit_item($item)) { ?>
                 <a class="btn btn-warning action"
-                   href="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>"><i class="bi bi-pencil"></i>Edit Item</a>
+                   href="<?php echo url_for('/item/edit.php?id=' . h(u($item['item_id']))); ?>"><i
+                            class="bi bi-pencil"></i>Edit Item</a>
                 <a class="btn btn-danger action"
-                   href="<?php echo url_for('/item/delete.php?id=' . h(u($item['item_id']))); ?>"><i class="bi bi-trash3"></i>Delete Item</a>
+                   href="<?php echo url_for('/item/delete.php?id=' . h(u($item['item_id']))); ?>"><i
+                            class="bi bi-trash3"></i>Delete Item</a>
             <?php } ?>
         </div>
 
