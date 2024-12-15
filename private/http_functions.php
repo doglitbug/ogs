@@ -58,25 +58,12 @@ function clean_input(?string $input = "", bool $allow_html = false): string
 
 /** Return a 404 error
  */
-function error_404(): void
+function error(string $code = "500", string $error_message = "Error"): void
 {
-    header($_SERVER["SERVER_PROTOCOL"] . " 404 Page Not Found");
-    exit();
-}
+    $params['code'] = $code;
+    $params['message'] = u($error_message);
 
-/** Return a 500 error
- */
-function error_500(): void
-{
-    header($_SERVER["SERVER_PROTOCOL"] . " 500 Internal Server Error");
-    exit();
-}
-
-/** Return a generic database error
- */
-function error_database(string $error_message = "Unspecified Database Error"): void
-{
-    header($_SERVER["SERVER_PROTOCOL"] . " 500 " . $error_message);
+    redirect_to(url_for('error.php?' . http_build_query($params)));
     exit();
 }
 

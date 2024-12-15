@@ -10,13 +10,12 @@ if (is_post_request()) {
     $_SESSION['email'] = $_POST['email'];
     $_SESSION['logon_method'] = "Impersonation";
     log_in();
-    //This needs to be a location that does not require log in, in case we are locked out
     redirect_to(url_for('/'));
 }
 
 $users = $db->get_users();
 
-$page_title = 'Log in';
+$page_title = 'Log in:';
 include(SHARED_PATH . '/public_header.php');
 ?>
 
@@ -27,15 +26,22 @@ include(SHARED_PATH . '/public_header.php');
         } else {
             ?>
             <div class="centered">
-                <a class="btn btn-social btn-google" href="<?php echo url_for("auth/google-oauth.php"); ?>"
-                   role="button">
-                    <i class="bi bi-google"></i> Log in with Google
-                </a>
                 <br>
-                <a class="btn btn-social btn-facebook disabled" href="<?php echo url_for("auth/facebook-oauth.php"); ?>"
-                   role="button">
-                    <i class="bi bi-facebook"></i> Log in with FaceBook
-                </a>
+                <?php if (isset($_ENV['google_oauth_client_id'])) { ?>
+                    <a class="btn btn-social btn-google"
+                       href="<?php echo url_for("auth/google-oauth.php"); ?>"
+                       role="button">
+                        <i class="bi bi-google"></i> Continue with Google
+                    </a>
+                <?php } ?>
+                <br>
+                <?php if (isset($_ENV['facebook_oauth_app_id'])) { ?>
+                    <a class="btn btn-social btn-facebook"
+                       href="<?php echo url_for("auth/facebook-oauth.php"); ?>"
+                       role="button">
+                        <i class="bi bi-facebook"></i> Continue with FaceBook
+                    </a>
+                <?php } ?>
             </div>
             <br/>
             <br/>

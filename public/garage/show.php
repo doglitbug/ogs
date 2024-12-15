@@ -12,8 +12,13 @@ if ($garage == null || ($garage['visible'] == '0' && !is_owner_or_worker($garage
 
 $options['garage_id'] = $garage['garage_id'];
 
+//Cache some database calls!
+$is_owner = is_owner($garage['garage_id']);
+$is_worker = is_worker($garage['garage_id']);
+$is_owner_or_worker = $is_owner || $is_worker;
+
 //Hide hidden items unless owner/worker
-if (!is_owner_or_worker($garage)) $options['visible'] = '1';
+if (!($is_owner_or_worker)) $options['visible'] = '1';
 
 $search = (get_parameter("search"));
 $options['search'] = $search;
@@ -33,7 +38,7 @@ include(SHARED_PATH . '/public_header.php');
         <div class="cta">
             <a class="btn btn-primary action" href="<?php echo url_for('/garage/index.php'); ?>"><i
                         class="bi bi-arrow-left"></i>Back</a>
-            <?php if (is_owner($garage['garage_id'])) { ?>
+            <?php if ($is_owner) { ?>
                 <a class="btn btn-warning action"
                    href="<?php echo url_for('/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>"><i
                             class="bi bi-pencil"></i>Edit
@@ -58,7 +63,7 @@ include(SHARED_PATH . '/public_header.php');
                         <th>Location</th>
                         <td><?php echo h($garage['location']); ?></td>
                     </tr>
-                    <?php if (is_owner_or_worker($garage)) { ?>
+                    <?php if ($is_owner_or_worker) { ?>
                         <tr>
                             <th>Visible</th>
                             <td><?php echo $garage['visible'] == 1 ? 'Visible to public' : 'Hidden from public'; ?></td>
@@ -90,7 +95,7 @@ include(SHARED_PATH . '/public_header.php');
 
         <h1>Items:</h1>
         <div class="cta">
-            <?php if (is_owner_or_worker($garage)) {
+            <?php if ($is_owner_or_worker) {
                 ?>
 
                 <a class="btn btn-success action"
@@ -110,7 +115,7 @@ include(SHARED_PATH . '/public_header.php');
                     <th>Preview</th>
                     <th>Name</th>
                     <th>Description</th>
-                    <?php if (is_owner_or_worker($garage)) { ?>
+                    <?php if ($is_owner_or_worker) { ?>
                         <th>Visible to public?</th>
                     <?php } ?>
                 </tr>
@@ -135,7 +140,7 @@ include(SHARED_PATH . '/public_header.php');
                             <a href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><?php echo h($item['name']); ?></a>
                         </td>
                         <td><?php echo nl2br(stripcslashes($item['description'])); ?></td>
-                        <?php if (is_owner_or_worker($garage)) { ?>
+                        <?php if ($is_owner_or_worker) { ?>
                             <td><?php echo $item['visible'] == 1 ? 'Visible' : 'Hidden'; ?></td>
                         <?php } ?>
                     </tr>
