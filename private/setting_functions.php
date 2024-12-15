@@ -11,7 +11,7 @@ class Settings
 
     public function load(): void
     {
-        $this->settings['page_size'] = 5;
+        $this->settings['page_size'] = 10;
         //TODO Load from database
     }
 

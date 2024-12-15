@@ -20,7 +20,7 @@ $is_owner_or_worker = $is_owner || $is_worker;
 //Hide hidden items unless owner/worker
 if (!($is_owner_or_worker)) $options['visible'] = '1';
 
-$search = (get_parameter("search"));
+$search = get_parameter("search");
 $options['search'] = $search;
 
 $max_items = sizeof($db->get_items($options));
