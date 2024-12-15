@@ -13,7 +13,7 @@ class Database
         try {
             $this->connection = new mysqli($_ENV["DATABASE_HOST"], $_ENV["DATABASE_USER"], $_ENV["DATABASE_PASS"], $_ENV["DATABASE_NAME"]);
         } catch (Exception) {
-            error_database("Could not connect to database");
+            error(500, "Could not connect to database");
         }
     }
 
@@ -66,7 +66,7 @@ class Database
             //Close
             $statement->close();
         } catch (Exception) {
-            error_database("Error getting data");
+            error(500, "Error getting data");
         }
 
         return $results;
@@ -93,7 +93,7 @@ class Database
             //Close
             $statement->close();
         } catch (Exception) {
-            error_database("Error inserting data");
+            error(500, "Error inserting data");
         }
 
         return $results;
@@ -120,11 +120,7 @@ class Database
             //Close
             $statement->close();
         } catch (Exception $e) {
-            dump($query);
-            dump($types);
-            dump($values);
-            dump($e);
-            error_database("Error updating data");
+            error(500, "Error updating data");
         }
     }
 
@@ -146,7 +142,7 @@ class Database
             //Close
             $statement->close();
         } catch (Exception) {
-            error_database("Error deleting data");
+            error(500, "Error deleting data");
         }
     }
 
@@ -323,6 +319,7 @@ class Database
         $result = $this->get_query($query, "ss", [$user['email'], $user['user_id']]);
         return $result != null;
     }
+
     /** Checks to see that no other user has this username
      * @param array $user Requires user_id and username
      * @return bool

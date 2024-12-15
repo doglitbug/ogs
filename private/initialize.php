@@ -25,6 +25,11 @@ require_once('database_functions.php');
 $db = new Database();
 $db->connect();
 
+//Load settings
+require_once('setting_functions.php');
+$settings = new Settings();
+$settings->load();
+
 require_once('http_functions.php');
 require_once('auth_functions.php');
 require_once('access_functions.php');
