@@ -12,11 +12,15 @@ class Database
     {
         try {
             $this->connection = new mysqli($_ENV["DATABASE_HOST"], $_ENV["DATABASE_USER"], $_ENV["DATABASE_PASS"], $_ENV["DATABASE_NAME"]);
-        } catch (Exception) {
-            error(500, "Could not connect to database");
+        } catch (Exception $e) {
+            //TODO point to error function/page, when it doesn't require database
+            die("Could not connect to database: " . $e);
         }
     }
 
+    /** Close the database connection if needed
+     * @return void
+     */
     public function disconnect(): void
     {
         if (isset($this->connnection)) {
@@ -65,8 +69,8 @@ class Database
             $results = $statement->get_result()?->fetch_all(MYSQLI_ASSOC);
             //Close
             $statement->close();
-        } catch (Exception) {
-            error(500, "Error getting data");
+        } catch (Exception $e) {
+            error(500, "Error getting data", $e);
         }
 
         return $results;
@@ -92,8 +96,8 @@ class Database
             $results = $this->connection->insert_id;
             //Close
             $statement->close();
-        } catch (Exception) {
-            error(500, "Error inserting data");
+        } catch (Exception $e) {
+            error(500, "Error inserting data", $e);
         }
 
         return $results;
@@ -120,7 +124,7 @@ class Database
             //Close
             $statement->close();
         } catch (Exception $e) {
-            error(500, "Error updating data");
+            error(500, "Error updating data", $e);
         }
     }
 
@@ -141,8 +145,8 @@ class Database
             $statement->execute();
             //Close
             $statement->close();
-        } catch (Exception) {
-            error(500, "Error deleting data");
+        } catch (Exception $e) {
+            error(500, "Error deleting data", $e);
         }
     }
 

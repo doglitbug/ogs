@@ -2,6 +2,6 @@
 global $db;
 require_once('../private/initialize.php');
 
-if(isset($db)) $db->disconnect();
-
+$db->disconnect();
+//TODO Pretty this, maybe logging?
 dump($_GET);

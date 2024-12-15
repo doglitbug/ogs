@@ -1,6 +1,4 @@
 <?php
-
-
 /** Generate URL from WWW_ROOT + $script_path
  * @param string $script_path input
  * @return string output
@@ -44,24 +42,33 @@ function h(?string $string = ""): string
 /** Attempt to clean up user input
  * @param string|null $input
  * @param bool $allow_html If true, allow a subset of html tags such as b and i
+ *                         This generally only used with fields called 'description'
  * @return string
+ * @todo allowed_html wil be set to none in settings on advice from https://www.php.net/manual/en/function.strip-tags.php
  */
 function clean_input(?string $input = "", bool $allow_html = false): string
 {
-    global $db;
+    global $db, $settings;
     $allowed_tags = [];
     if ($allow_html) {
-        $allowed_tags = ['b', 'i'];
+        $allowed_tags = $settings->get('allowed_html');
     }
     return $db->escape(trim(strip_tags($input, $allowed_tags)));
 }
 
-/** Return a 404 error
+/**
+ * @param string $code
+ * @param string $error_message
+ * @param string $e
+ * @return void
  */
-function error(string $code = "500", string $error_message = "Error"): void
+function error(string $code = "500", string $error_message = "Error", string $e = ""): void
 {
     $params['code'] = $code;
     $params['message'] = u($error_message);
+    if ($_ENV == "DEV") {
+        $params['extended'] = u($e);
+    }
 
     redirect_to(url_for('error.php?' . http_build_query($params)));
     exit();
@@ -95,11 +102,10 @@ function is_get_request(): bool
 
 /** Retrieve parameter by name.
  * Tried POST, then GET, then returns empty string
- * @param string|null $name
- * @param array $options Unused
+ * @param string $name
  * @return string
  */
-function get_parameter(?string $name, array $options = []): string
+function get_parameter(string $name): string
 {
     if (isset($_POST[$name])) return $_POST[$name];
     if (isset($_GET[$name])) return $_GET[$name];

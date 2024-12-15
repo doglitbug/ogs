@@ -166,7 +166,7 @@ function get_page_and_size(): array
 {
     global $settings;
     $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 && $_GET['page'] < 1000 ? (int)$_GET['page'] : 1;
-    $size = isset($_GET['size']) && is_numeric($_GET['size']) && $_GET['size'] > 0 && $_GET['size'] < 1000 ? (int)$_GET['size'] : $settings->get('page_size2');
+    $size = isset($_GET['size']) && is_numeric($_GET['size']) && $_GET['size'] > 0 && $_GET['size'] < 1000 ? (int)$_GET['size'] : $settings->get('page_size');
     return [$page, $size];
 }
 

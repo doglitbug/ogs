@@ -39,7 +39,6 @@ if (!empty($_GET['code'])) {
             // Authenticate the user
             session_regenerate_id();
             $_SESSION['logon_method'] = 'Google';
-            //Do this in a separate file to reuse code for facebook log on
             $_SESSION['email'] = $profile['email'];
 
             if ($db->check_email_exists($_SESSION['email'])) {
@@ -59,12 +58,10 @@ if (!empty($_GET['code'])) {
                 redirect_to(url_for('user/edit.php'));
             }
         } else {
-            //TODO Close $db, or redirect to error page that does!
-            exit('Could not retrieve profile information! Please try again later!');
+            error(400, 'Could not retrieve profile information! Please try again later!');
         }
     } else {
-        //TODO Close $db, or redirect to error page that does!
-        exit('Invalid access token! Please try again later!');
+        error(400, 'Invalid access token! Please try again later!');
     }
 } else {
     // Define params and redirect to Google Authentication page
@@ -76,7 +73,7 @@ if (!empty($_GET['code'])) {
         'access_type' => 'offline',
         'prompt' => 'consent'
     ];
-    //TODO Close $db
+    $db->disconnect();
     header('Location: https://accounts.google.com/o/oauth2/auth?' . http_build_query($params));
     exit;
 }
