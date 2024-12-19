@@ -1,8 +1,8 @@
 <?php
 $sections = array(
-    "Users" => url_for("staff/user"),
-    "Garages" => url_for("staff/garage"),
-    "Items" => url_for("staff/item"),
+    "Users" => url_for("admin/user"),
+    "Garages" => url_for("admin/garage"),
+    "Items" => url_for("admin/item"),
     "Customer" => url_for("/"),
     "Log out" => url_for('auth/logout.php')
 );
@@ -14,7 +14,7 @@ $current = basename(dirname($_SERVER['PHP_SELF']));
 
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <a class="navbar-brand" href="<?php echo url_for('staff'); ?>">Online Garage Sale</a>
+        <a class="navbar-brand" href="<?php echo url_for('admin'); ?>">Online Garage Sale</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>

@@ -22,14 +22,14 @@ if (is_post_request()) {
     if (empty($errors)) {
         $db->update_garage($garage);
         $_SESSION['message'] = 'Garage updated successfully';
-        redirect_to(url_for('staff/garage'));
+        redirect_to(url_for('admin/garage'));
     }
 }
 
 $locations = $db->get_locations();
 
 $page_title = 'Edit Garage: ' . h($garage['name']);
-include(SHARED_PATH . '/staff_header.php');
+include(SHARED_PATH . '/admin_header.php');
 ?>
 
     <div id="content">
@@ -37,7 +37,7 @@ include(SHARED_PATH . '/staff_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('staff/garage/show.php?id=' . h(u($garage['garage_id']))); ?>"><i
+               href="<?php echo url_for('admin/garage/show.php?id=' . h(u($garage['garage_id']))); ?>"><i
                         class="bi bi-arrow-left"></i>Back</a>
         </div>
 
@@ -90,4 +90,4 @@ include(SHARED_PATH . '/staff_header.php');
         </form>
     </div>
 
-<?php include(SHARED_PATH . '/staff_footer.php'); ?>
+<?php include(SHARED_PATH . '/admin_footer.php'); ?>

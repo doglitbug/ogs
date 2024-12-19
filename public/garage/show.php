@@ -27,7 +27,7 @@ $max_items = sizeof($db->get_items($options));
 $options['paginate'] = 'true';
 $shown_items = $db->get_items($options);
 
-$garage_staff = $db->get_garage_staff($garage['garage_id']);
+$garage_worker = $db->get_garage_admin($garage['garage_id']);
 
 $page_title = 'Show Garage: ' . h($garage['name']);
 include(SHARED_PATH . '/public_header.php');
@@ -80,9 +80,9 @@ include(SHARED_PATH . '/public_header.php');
                 <h2>Contact:</h2>
                 <table class="table table-hover">
                     <?php if (is_logged_in()) {
-                        foreach ($garage_staff as $gsm) {
-                            echo '<tr><th>' . $gsm['access'] . '</th>';
-                            echo '<td><a href="' . url_for("/user/show.php?id=" . h(u($gsm['user_id']))) . '">' . h(u($gsm['username'])) . '</a>';
+                        foreach ($garage_worker as $worker) {
+                            echo '<tr><th>' . $worker['access'] . '</th>';
+                            echo '<td><a href="' . url_for("/user/show.php?id=" . h(u($worker['user_id']))) . '">' . h(u($worker['username'])) . '</a>';
                             echo '</td></tr>';
                         }
                     } else {

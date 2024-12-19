@@ -4,7 +4,7 @@ $sections['Items'] = url_for("item");
 
 if (is_logged_in()) {
     if (is_admin($_SESSION['user_id']) || is_super_admin($_SESSION['user_id'])) {
-        $sections['Staff'] = url_for("staff");
+        $sections['Admin'] = url_for("admin");
     }
     $sections['Profile'] = url_for('user/show.php');
     $sections['Log out'] = url_for('auth/logout.php');

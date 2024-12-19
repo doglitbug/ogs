@@ -152,6 +152,24 @@ class Database
 
 #endregion
 
+#region settings
+    public function get_settings(): array
+    {
+        $query = <<<SQL
+            SELECT name, value
+            FROM settings
+        SQL;
+
+        return $this->get_query($query);
+    }
+
+    public function update_settings(array $settings): void
+    {
+
+    }
+
+#endregion
+
 #region user
     /** Get all users
      * @param array $options search: Filter to search
@@ -486,7 +504,7 @@ class Database
      * @param string $garage_id
      * @return array|null
      */
-    public function get_garage_staff(string $garage_id): array|null
+    public function get_garage_admin(string $garage_id): array|null
     {
         $query = <<<SQL
         SELECT  user_id,

@@ -8,17 +8,17 @@ $id = get_parameter('id');
 $garage = $db->get_garage($id);
 if ($garage == null) {
     $_SESSION['error'] = 'Garage not found';
-    redirect_to(url_for('staff/garage'));
+    redirect_to(url_for('admin/garage'));
 }
 
 if (is_post_request()) {
     //TODO Delete garage
     $_SESSION['message'] = 'Garage deleted successfully';
-    redirect_to(url_for('staff/garage'));
+    redirect_to(url_for('admin/garage'));
 }
 
 $page_title = 'Delete Garage: ' . h($garage['name']);
-include(SHARED_PATH . '/staff_header.php');
+include(SHARED_PATH . '/admin_header.php');
 ?>
 
     <div id="content">
@@ -26,7 +26,7 @@ include(SHARED_PATH . '/staff_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/staff/garage'); ?>">
+               href="<?php echo url_for('/admin/garage'); ?>">
                 <i class="bi bi-arrow-left"></i>Back</a>
         </div>
         <div><p>Unfortunately we are unable to delete garages at this time, please consider hiding them<br/>
@@ -39,4 +39,4 @@ include(SHARED_PATH . '/staff_header.php');
         </div>
     </div>
 
-<?php include(SHARED_PATH . '/staff_footer.php'); ?>
+<?php include(SHARED_PATH . '/admin_footer.php'); ?>

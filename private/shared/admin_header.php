@@ -1,6 +1,6 @@
 <?php
 if (!isset($page_title)) {
-    $page_title = 'Staff Area';
+    $page_title = 'Admin Area';
 }
 ?>
 
@@ -15,12 +15,12 @@ if (!isset($page_title)) {
               crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <link rel="stylesheet" media="all" href="<?php echo url_for('/stylesheets/public.css'); ?>"/>
-        <link rel="stylesheet" media="all" href="<?php echo url_for('/stylesheets/staff.css'); ?>"/>
+        <link rel="stylesheet" media="all" href="<?php echo url_for('/stylesheets/admin.css'); ?>"/>
     </head>
 <body>
 
 <?php
-require('staff_navbar.php');
+require('admin_navbar.php');
 ?>
     <div class="container">
 <?php

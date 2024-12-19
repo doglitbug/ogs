@@ -10,7 +10,7 @@ $options['paginate'] = 'true';
 $users = $db->get_users($options);
 
 $page_title = 'Users';
-include(SHARED_PATH . '/staff_header.php');
+include(SHARED_PATH . '/admin_header.php');
 ?>
 
 <div id="content">
@@ -45,10 +45,10 @@ include(SHARED_PATH . '/staff_header.php');
 
 
                     <td><a class="action"
-                           href="<?php echo url_for('/staff/user/edit.php?id=' . h(u($user['user_id']))); ?>">View/Edit</a>
+                           href="<?php echo url_for('/admin/user/edit.php?id=' . h(u($user['user_id']))); ?>">View/Edit</a>
                     </td>
                     <td><a class="action"
-                           href="<?php echo url_for('/staff/user/delete.php?id=' . h(u($user['user_id']))); ?>">Delete</a>
+                           href="<?php echo url_for('/admin/user/delete.php?id=' . h(u($user['user_id']))); ?>">Delete</a>
                     </td>
                 </tr>
             <?php } ?>
@@ -57,4 +57,4 @@ include(SHARED_PATH . '/staff_header.php');
     </div>
 </div>
 
-<?php include(SHARED_PATH . '/staff_footer.php'); ?>
+<?php include(SHARED_PATH . '/admin_footer.php'); ?>

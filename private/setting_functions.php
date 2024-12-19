@@ -4,20 +4,20 @@ class Settings
 {
     protected array $settings = [];
 
-    public function __construct()
-    {
-        //TODO Check database connection exists?
-    }
-
     public function load(): void
     {
-        $this->settings['page_size'] = 10;
-        //TODO Load from database
+        global $db;
+        $db_settings = $db->get_settings();
+        //TODO Figure out if there is a cleaner way to do this, like a map or reduce
+        foreach($db_settings as $db_setting){
+            $this->settings[$db_setting['name']] = $db_setting['value'];
+        }
     }
 
-    public function save(array $settings): void
+    public function save(): void
     {
         //TODO Save to database
+
     }
 
     public function get(string $name): mixed
