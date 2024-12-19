@@ -1,11 +1,13 @@
 <?php
-global $db;
+global $db, $settings;
 require_once('../../private/initialize.php');
 
 $public_garages = $db->get_garages(['visible' => '1']);
 $my_garages = [];
 if (is_logged_in()) {
     $my_garages = $db->get_garages_by_user($_SESSION['user_id']);
+    $current_garages = sizeof($db->get_garages_by_user($_SESSION['user_id'], ['access' => 'Owner']));
+    $max_garages = $settings->get('max_garages');
 }
 
 $page_title = 'Garages';
@@ -16,12 +18,13 @@ include(SHARED_PATH . '/public_header.php');
         <?php if (is_logged_in()) { ?>
             <h1><?php echo $page_title; ?></h1>
             <div class="cta">
-                <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>"><i class="bi bi-plus-lg"></i>New
+                <a class="btn btn-success action" href="<?php echo url_for('/garage/create.php'); ?>"><i
+                            class="bi bi-plus-lg"></i>New
                     Garage</a>
             </div>
         <?php } ?>
         <?php if (is_logged_in()) { ?>
-            <h1>My garages</h1>
+            <h1>My garages: <?php echo $current_garages . '/' . $max_garages; ?></h1>
             <div>
                 <table class="table table-hover">
                     <thead>

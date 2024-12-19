@@ -4,7 +4,7 @@ require_once('../../../private/initialize.php');
 require_admin();
 
 $options['search'] = get_parameter("search");
-$max_items = sizeof($db->get_items($options));
+$item_count = sizeof($db->get_items($options));
 
 $options['paginate'] = 'true';
 $items = $db->get_items($options);
@@ -60,7 +60,7 @@ include(SHARED_PATH . '/admin_header.php');
                 </tr>
             <?php } ?>
         </table>
-        <?php generate_pagination_links($max_items); ?>
+        <?php generate_pagination_links($item_count); ?>
     </div>
 </div>
 

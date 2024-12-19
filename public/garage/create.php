@@ -1,9 +1,17 @@
 <?php
-global $db;
+global $db, $settings;
 require_once('../../private/initialize.php');
 require_login();
 
 $garage = [];
+
+$current_garages = sizeof($db->get_garages_by_user($_SESSION['user_id'], ['access' => 'Owner']));
+$max_garages = $settings->get('max_garages');
+
+if ($current_garages >= $max_garages) {
+    $_SESSION['error'] = 'Unable to create additional Garages as you have reached or are over your allocation of ' . $max_garages . ' per account';
+    redirect_to(url_for('/garage/'));
+}
 
 if (is_post_request()) {
     $garage['name'] = clean_input($_POST['name']);

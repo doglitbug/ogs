@@ -6,7 +6,7 @@ $search = (get_parameter("search"));
 $options['search'] = $search;
 $options['visible'] = '1';
 
-$max_items = sizeof($db->get_items($options));
+$item_count = sizeof($db->get_items($options));
 $options['paginate'] = 'true';
 $shown_items = $db->get_items($options);
 
@@ -51,7 +51,7 @@ include(SHARED_PATH . '/public_header.php');
             <?php } ?>
             </tbody>
         </table>
-        <?php generate_pagination_links($max_items); ?>
+        <?php generate_pagination_links($item_count); ?>
     </div>
 </div>
 <?php include(SHARED_PATH . '/public_footer.php'); ?>

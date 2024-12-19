@@ -1,5 +1,5 @@
 <?php
-global $db;
+global $db, $settings;
 require_once('../../private/initialize.php');
 require_login();
 
@@ -16,6 +16,15 @@ if ($garage == null) {
 
 if (!is_owner_or_worker($garage)) {
     $_SESSION['error'] = 'You do not have authority to add items to that Garage';
+    redirect_to(url_for('/garage/show.php?id=' . h(u($garage['garage_id']))));
+}
+
+$options['garage_id'] = $garage['garage_id'];
+$item_count = sizeof($db->get_items($options));
+$max_items = $settings->get('max_items');
+
+if ($item_count >= $max_items) {
+    $_SESSION['error'] = 'Unable to create additional items as you have reached or are over the allocation of ' . $max_items . ' per garage';
     redirect_to(url_for('/garage/show.php?id=' . h(u($garage['garage_id']))));
 }
 
