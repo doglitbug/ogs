@@ -9,7 +9,7 @@ $max_items = sizeof($db->get_items($options));
 $options['paginate'] = 'true';
 $items = $db->get_items($options);
 $page_title = 'Items';
-include(SHARED_PATH . '/staff_header.php');
+include(SHARED_PATH . '/admin_header.php');
 ?>
 
 <div id="content">
@@ -49,13 +49,13 @@ include(SHARED_PATH . '/staff_header.php');
                     <td><?php echo h($item['created_at']); ?></a></td>
                     <td><?php echo h($item['updated_at']); ?></a></td>
                     <td><a class="action"
-                           href="<?php echo url_for('/staff/item/show.php?id=' . h(u($item['item_id']))); ?>">View</a>
+                           href="<?php echo url_for('/admin/item/show.php?id=' . h(u($item['item_id']))); ?>">View</a>
                     </td>
                     <td><a class="action"
-                           href="<?php echo url_for('/staff/item/edit.php?id=' . h(u($item['item_id']))); ?>">Edit</a>
+                           href="<?php echo url_for('/admin/item/edit.php?id=' . h(u($item['item_id']))); ?>">Edit</a>
                     </td>
                     <td><a class="action"
-                           href="<?php echo url_for('/staff/item/delete.php?id=' . h(u($item['item_id']))); ?>">Delete</a>
+                           href="<?php echo url_for('/admin/item/delete.php?id=' . h(u($item['item_id']))); ?>">Delete</a>
                     </td>
                 </tr>
             <?php } ?>
@@ -64,4 +64,4 @@ include(SHARED_PATH . '/staff_header.php');
     </div>
 </div>
 
-<?php include(SHARED_PATH . '/staff_footer.php'); ?>
+<?php include(SHARED_PATH . '/admin_footer.php'); ?>

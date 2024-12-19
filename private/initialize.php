@@ -21,16 +21,16 @@ $dotenv = new DotEnv(PRIVATE_PATH . '/.env');
 $dotenv->load();
 
 //Connect to database
-require_once('database_functions.php');
+require_once('database_functions.php'); //Requires $dotenv
 $db = new Database();
 $db->connect();
 
-//Load settings
-require_once('setting_functions.php');
+require_once('http_functions.php'); //Requires $db
+
+require_once('setting_functions.php'); //Requires $db
 $settings = new Settings();
 $settings->load();
 
-require_once('http_functions.php');
 require_once('auth_functions.php');
 require_once('access_functions.php');
 require_once('misc_functions.php');

@@ -10,7 +10,7 @@ $options['paginate'] = 'true';
 $garages = $db->get_garages($options);
 
 $page_title = 'Garages';
-include(SHARED_PATH . '/staff_header.php');
+include(SHARED_PATH . '/admin_header.php');
 ?>
 
 <div id="content">
@@ -41,10 +41,10 @@ include(SHARED_PATH . '/staff_header.php');
                     <td><?php echo h($garage['updated_at']); ?></a></td>
 
                     <td><a class="action"
-                           href="<?php echo url_for('/staff/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">View/Edit</a>
+                           href="<?php echo url_for('/admin/garage/edit.php?id=' . h(u($garage['garage_id']))); ?>">View/Edit</a>
                     </td>
                     <td><a class="action"
-                           href="<?php echo url_for('/staff/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>">Delete</a>
+                           href="<?php echo url_for('/admin/garage/delete.php?id=' . h(u($garage['garage_id']))); ?>">Delete</a>
                     </td>
                 </tr>
             <?php } ?>
@@ -53,4 +53,4 @@ include(SHARED_PATH . '/staff_header.php');
     </div>
 </div>
 
-<?php include(SHARED_PATH . '/staff_footer.php'); ?>
+<?php include(SHARED_PATH . '/admin_footer.php'); ?>

@@ -8,17 +8,17 @@ $id = get_parameter('id');
 $user = $db->get_user($id);
 if ($user == null) {
     $_SESSION['error'] = 'User not found';
-    redirect_to(url_for('/staff/user'));
+    redirect_to(url_for('/admin/user'));
 }
 
 if (is_post_request()) {
     //TODO Delete user
     $_SESSION['message'] = 'User deleted successfully';
-    redirect_to(url_for('staff/user'));
+    redirect_to(url_for('admin/user'));
 }
 
 $page_title = 'Delete User: ' . h($user['username']);
-include(SHARED_PATH . '/staff_header.php');
+include(SHARED_PATH . '/admin_header.php');
 ?>
 
     <div id="content">
@@ -26,7 +26,7 @@ include(SHARED_PATH . '/staff_header.php');
 
         <div class="cta">
             <a class="btn btn-primary action"
-               href="<?php echo url_for('/staff/user'); ?>">
+               href="<?php echo url_for('/admin/user'); ?>">
                 <i class="bi bi-arrow-left"></i>Back</a>
         </div>
         <div><p>Unfortunately we are unable to delete users at this time, please consider locking them out<br/>
@@ -39,4 +39,4 @@ include(SHARED_PATH . '/staff_header.php');
         </div>
     </div>
 
-<?php include(SHARED_PATH . '/staff_footer.php'); ?>
+<?php include(SHARED_PATH . '/admin_footer.php'); ?>
