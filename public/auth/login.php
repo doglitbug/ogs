@@ -2,11 +2,7 @@
 global $db;
 require_once('../../private/initialize.php');
 
-if ($_ENV['APPLICATION_ENV'] !== "DEV") {
-    die("This should not even exist in PROD");
-}
-
-if (is_post_request()) {
+if (is_post_request() && $_ENV['APPLICATION_ENV'] == "DEV") {
     $_SESSION['email'] = $_POST['email'];
     $_SESSION['logon_method'] = "Impersonation";
     log_in();
@@ -44,6 +40,8 @@ include(SHARED_PATH . '/public_header.php');
                 <?php } ?>
             </div>
             <br/>
+
+            <?php if ($_ENV['APPLICATION_ENV'] == "DEV") { ?>
             <br/>
             <div class="centered">
                 <h1>Impersonation</h1>
@@ -58,6 +56,8 @@ include(SHARED_PATH . '/public_header.php');
                     <button type="submit" class="btn btn-secondary">Impersonate</button>
                 </form>
             </div>
+            <?php } ?>
+
         <?php } ?>
     </div>
 
