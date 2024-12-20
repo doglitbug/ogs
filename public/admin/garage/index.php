@@ -28,7 +28,6 @@ include(SHARED_PATH . '/admin_header.php');
                 <th>updated_at</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
-                <th>&nbsp;</th>
             </tr>
             <?php foreach ($garages as $garage) { ?>
                 <tr>

@@ -1,5 +1,5 @@
 <?php
-global $db;
+global $db, $settings;
 require_once('../../private/initialize.php');
 
 $id = $_GET['id'] ?? '0';
@@ -11,6 +11,7 @@ if ($item == null || ($item['visible'] == '0' && !can_edit_item($item))) {
 }
 
 $images = $db->get_item_images($item['item_id']);
+$max_images = $settings->get('max_images');
 
 $page_title = 'Show Item: ' . $item['name'];
 include(SHARED_PATH . '/public_header.php');
@@ -52,7 +53,7 @@ include(SHARED_PATH . '/public_header.php');
             </table>
         </div>
 
-        <h3>Images:</h3>
+        <h3>Images: <?php echo sizeof($images) . '/' . $max_images; ?></h3>
         <div class="images">
             <?php foreach ($images as $image) {
                 list($width, $height) = rescale_image_size($image);
