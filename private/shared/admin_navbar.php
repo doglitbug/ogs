@@ -1,5 +1,6 @@
 <?php
 $sections = array(
+    "Settings" => url_for("admin/setting"),
     "Users" => url_for("admin/user"),
     "Garages" => url_for("admin/garage"),
     "Items" => url_for("admin/item"),

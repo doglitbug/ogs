@@ -1,5 +1,5 @@
 <?php
-global $db;
+global $db, $settings;
 require_once('../../private/initialize.php');
 require_login();
 
@@ -17,6 +17,7 @@ if (!can_edit_item($item)) {
 }
 
 $images = $db->get_item_images($item['item_id']);
+$max_images = $settings->get('max_images');
 
 if (is_post_request()) {
     //Check to see if POST data was discarded due to overlarge file
@@ -28,10 +29,9 @@ if (is_post_request()) {
 
         $errors = validate_item($item, $_FILES);
 
+
         if (empty($errors)) {
             $db->update_item($item);
-            //Add new images
-            move_and_link_images($_FILES, $item['item_id']);
 
             //Remove deleted images
             if (isset($_POST['delete'])) {
@@ -45,6 +45,15 @@ if (is_post_request()) {
                 }
             }
 
+            //Now that we (may) have removed images, get new count and check limit
+            //TODO Add error if attempting to go over the limit
+            $current_images = sizeof($db->get_item_images($item['item_id']));
+            if ($current_images < $settings->get('max_images')) {
+                //Add new images
+                //TODO This assumes that we only ever add ONE image here, if not we might go over the limit
+                //Remember that $_FILES might not always have valid image data etc
+                move_and_link_images($_FILES, $item['item_id']);
+            }
             $_SESSION['message'] = 'Item updated successfully';
             redirect_to(url_for('/item/show.php?id=' . h(u($item['item_id']))));
         }
@@ -95,7 +104,7 @@ include(SHARED_PATH . '/public_header.php');
                 <?php validation('description'); ?>
             </div>
 
-            <h3>Images:</h3>
+            <h3>Images: <?php echo sizeof($images) . '/' . $max_images; ?></h3>
 
             <?php foreach ($images as $image) {
                 list($width, $height) = rescale_image_size($image);
