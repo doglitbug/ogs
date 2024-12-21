@@ -1,5 +1,5 @@
 <?php
 
-header("Location: https://blog.doglitbug.xyz/public");
+header("Location: https://ogs.doglitbug.xyz/public");
 exit;
 ?>
