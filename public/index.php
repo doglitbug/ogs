@@ -36,5 +36,6 @@ include(SHARED_PATH . '/public_header.php');
 <p>
     Local individuals, maker spaces, and op shops are all welcome here!
 </p>
+<p>Any questions, comments, bugs etc, please contact onlinegaragesale1234(at)gmail.com</p>
 <?php include(SHARED_PATH . '/public_footer.php'); ?>
 
