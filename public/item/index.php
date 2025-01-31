@@ -25,6 +25,7 @@ include(SHARED_PATH . '/public_header.php');
                 <th>Preview</th>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Location</th>
             </tr>
             </thead>
             <tbody>
@@ -47,6 +48,7 @@ include(SHARED_PATH . '/public_header.php');
                         <a href="<?php echo url_for('/item/show.php?id=' . h(u($item['item_id']))); ?>"><?php echo h($item['name']); ?></a>
                     </td>
                     <td><?php echo nl2br(stripcslashes($item['description'])); ?></td>
+                    <td><?php echo $item['location']; ?></td>
                 </tr>
             <?php } ?>
             </tbody>

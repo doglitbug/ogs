@@ -607,6 +607,7 @@ class Database
                 image.image_id,
                 image.width,
                 image.height,
+                location.description as location,
                 CONCAT(path, '/', filename) as source
         FROM item
         LEFT JOIN LATERAL (SELECT   *
@@ -618,6 +619,7 @@ class Database
         LEFT JOIN (SELECT   *
                             FROM image) as image using (image_id)
         LEFT JOIN garage USING (garage_id)
+        LEFT JOIN location USING (location_id)
         SQL;
 
         $where_and = "WHERE";
