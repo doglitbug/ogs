@@ -1,5 +1,8 @@
 .idea/*
 .env
 
+build
+
 public/images/item/*
 public/images/garage/*
+

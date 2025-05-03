@@ -66,7 +66,7 @@ function error(string $code = "500", string $error_message = "Error", string $e 
 {
     $params['code'] = $code;
     $params['message'] = u($error_message);
-    if ($_ENV == "DEV") {
+    if ($_ENV['APPLICATION_ENV'] === "DEV") {
         $params['extended'] = u($e);
     }
 
