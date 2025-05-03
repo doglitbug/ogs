@@ -1,6 +1,10 @@
 # ogs
 Online Garage Sale website
 
+This is the source code for the website at https://ogs.doglitbug.xyz
+
+At this time, this website will be sunset and replaced with a React version and as such this repo will likely not be updated any further.
+
 ## Deployment steps
 
 First(1) location in database should be 'Unknown'/'Unset'
